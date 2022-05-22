@@ -1,6 +1,6 @@
 #include <stdint.h>
 
-typedef struct uart {
+typedef struct {
     volatile uint8_t dr;
     volatile uint32_t rsrecr;
     volatile uint32_t unused_1;
