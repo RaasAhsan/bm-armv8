@@ -20,7 +20,7 @@ _start:
 foo:
     ldr x22, =0
     ldr x22, =1
-    brk 1
+    ldr x23, =0xff
     b foo
 
 vector_table_align

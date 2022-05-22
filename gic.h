@@ -34,3 +34,8 @@ typedef struct {
     volatile uint32_t bpr; // GICC_BPR
     const volatile uint32_t iar; // GICC_IAR
 } gicc;
+
+void gicd_init(gicd *dist);
+void gicd_enable_irq(gicd *dist, irq_id id);
+void gicd_disable_irq(gicd *dist, irq_id id);
+void gicc_init(gicc *cpu);
