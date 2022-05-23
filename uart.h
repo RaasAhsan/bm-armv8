@@ -18,7 +18,7 @@ typedef struct {
     volatile uint32_t imsc;
 } uart;
 
-uart* uart_init(uint8_t *address);
+void uart_init(uart *u);
 void uart_putchar(uart *u, char c);
 char uart_getchar(uart *u);
 void uart_gets(uart *u, char *buf);

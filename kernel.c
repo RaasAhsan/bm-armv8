@@ -23,6 +23,8 @@ int kmain(void) {
     gicd_enable_irq(dist, 8);
     // gicd_enable_irq(dist, 27);
 
+    gicd_sgi(dist, 8);
+
     // dist->icpendr[0] = 8;
 
     // int ptr = (int) &dist->sgir;
@@ -34,15 +36,13 @@ int kmain(void) {
     
     // dist->ipriorityr[6] = 0x0;
     // dist->icpendr[0] = 0xffffffff;
+}
 
-    // uart* u = uart_init(uart0);
-    // uart_puts(u, "Helo worlds!\n");
+void handle_irq() {
+    uart *u = (uart*) uart0_ptr;
+    uart_init(u);
+    uart_puts(u, "IRQ interrupt!!\n");
     // char buf[16];
     // uart_gets(u, buf);
     // uart_puts(u, buf);
-}
-
-void bmain(void) {
-    gicd *dist = (gicd*) gicd_ptr;
-    gicd_sgi(dist, 8);
 }

@@ -6,8 +6,6 @@
 .align 7
 .endm
 
-.set DAIF_WR_IRQ_BIT,   (1 << 1)
-
 .global _start
 _start:
     // Initialize stack
@@ -18,13 +16,11 @@ _start:
     ldr x20, =vectors
     msr vbar_el1, x20
 
+    // Turn off IRQ/FIQ masks
+    msr daifclr, #0b0011
+
     bl kmain
 
-    msr daifclr, #0b0011
-    isb
-    mrs x11, daif
-
-    bl bmain
     // ldr x14, =0xdeadbeef
 
     // Initialize timer
@@ -76,7 +72,7 @@ curr_el_spx_sync:
     b .
     vector_entry_align
 curr_el_spx_irq:
-    ldr x25, =0x33
+    bl handle_irq
     b .
     vector_entry_align
 curr_el_spx_fiq:

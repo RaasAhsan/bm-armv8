@@ -21,9 +21,7 @@ void uart_flush(uart *u) {
     }
 }
 
-uart* uart_init(uint8_t *address) {
-    uart* u = (uart*) address;
-
+void uart_init(uart *u) {
     u->cr = 0x00;
 
     // Enable interrupts
@@ -33,8 +31,6 @@ uart* uart_init(uint8_t *address) {
     u->cr = UART_CR_UARTEN | UART_CR_RXE | UART_CR_TXE;
 
     uart_flush(u);
-
-    return u;
 }
 
 void uart_putchar(uart *u, char c) {
