@@ -44,5 +44,11 @@ typedef struct {
 void gicd_init(gicd *dist);
 void gicd_enable_irq(gicd *dist, irq_id id);
 void gicd_disable_irq(gicd *dist, irq_id id);
+void gicd_clear_pending(gicd *dist, irq_id id);
+void gicd_set_priority(gicd *dist, irq_id id, uint8_t prio);
+void gicd_set_config(gicd *dist, irq_id id, int config);
+
 void gicc_init(gicc *cpu);
+
+
 void gicd_sgi(gicd *dist, irq_id id);

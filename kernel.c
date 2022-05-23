@@ -8,17 +8,17 @@ uintptr_t gicd_ptr = (uintptr_t) 0x08000000;
 uintptr_t gicc_ptr = (uintptr_t) 0x08010000; 
 
 int kmain(void) {
-    int x = 5 / 0;
-
     gicd *dist = (gicd*) gicd_ptr;
     gicc *cpu = (gicc*) gicc_ptr;
 
     gicd_init(dist);
     gicc_init(cpu);
 
-    dist->icpendr[0] = 0x8;
-    dist->ipriorityr[2] = 0xffffff00;
-    dist->icfgr[0] = 0xaaaaaaaa;
+    // dist->icpendr[0] = 0x8;
+
+    gicd_clear_pending(dist, 8);
+    gicd_set_priority(dist, 8, 0x00);
+    gicd_set_config(dist, 8, 1);
 
     gicd_enable_irq(dist, 8);
     // gicd_enable_irq(dist, 27);

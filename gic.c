@@ -36,15 +36,43 @@ void gicd_init(gicd *dist) {
 }
 
 void gicd_enable_irq(gicd *dist, irq_id id) {
+    // 1 bit per interrupt
     int index = id / 32;
     int bit = id % 32;
     dist->isenabler[index] = (1 << bit);
 }
 
 void gicd_disable_irq(gicd *dist, irq_id id) {
+    // 1 bit per interrupt
     int index = id / 32;
     int bit = id % 32;
     dist->icenabler[index] = (1 << bit);
+}
+
+void gicd_clear_pending(gicd *dist, irq_id id) {
+    dist->icpendr[id / 32] = 1U << (id % 32);
+}
+
+void gicd_set_priority(gicd *dist, irq_id id, uint8_t prio) {
+    // 1 byte (8 bits) per interrupt
+    int regn = id / 4;
+    int regi = id % 4;
+    int shift = regi * 8;
+    uint32_t reg = dist->ipriorityr[regn];
+    reg &= ~(((uint32_t) 0xff) << shift);
+    reg |= prio << shift;
+    dist->ipriorityr[regn] = reg;
+}
+
+void gicd_set_config(gicd *dist, irq_id id, int config) {
+    // 2 bits per interrupt
+    int regn = id / 16;
+    int regi = id % 16;
+    int shift = regi * 2;
+    uint32_t reg = dist->icfgr[regn];
+    reg &= ~(((uint32_t) 0x2) << shift);
+    reg |= (config << 1) << shift;
+    dist->icfgr[regn] = reg;
 }
 
 void gicd_sgi(gicd *dist, irq_id id) {
