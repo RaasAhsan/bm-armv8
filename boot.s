@@ -6,6 +6,8 @@
 .align 7
 .endm
 
+.set DAIF_WR_IRQ_BIT,   (1 << 1)
+
 .global _start
 _start:
     // Initialize stack
@@ -17,11 +19,36 @@ _start:
     msr vbar_el1, x20
 
     bl kmain
+
+    msr daifclr, #0b0011
+    isb
+    mrs x11, daif
+
+    bl bmain
+    // ldr x14, =0xdeadbeef
+
+    // Initialize timer
+    //mrs x21, cntv_ctl_el0 // read ctl
+    //ldr x15, =0x1
+    //orr x21, x21, x15 // turn on enable bit
+    //msr cntv_ctl_el0, x21 // write ctl
+
+    // ldr x25, =2000
+    // msr cntv_tval_el0, x25
+    //mrs x17, cntv_tval_el0
+    //mrs x18, cntv_cval_el0
 foo:
-    ldr x22, =0
-    ldr x22, =1
-    ldr x23, =0xff
+    // mrs x12, SPSel
+    ldr x10, =1
+    ldr x10, =2
+    // svc #1
     b foo
+test:
+    // Check system counter, write 1000 to tval, then observe that cval is system counter + 1000
+    mrs x23, cntpct_el0
+    ldr x25, =1000
+    msr cntv_tval_el0, x25
+    mrs x24, cntv_cval_el0
 
 vector_table_align
 vectors:
@@ -43,9 +70,13 @@ curr_el_sp0_serror:
     // brk comes here
     vector_entry_align
 curr_el_spx_sync:
+    // ldr x25, =0x34
+    // exception syndrome register
+    mrs x25, esr_el1
     b .
     vector_entry_align
 curr_el_spx_irq:
+    ldr x25, =0x33
     b .
     vector_entry_align
 curr_el_spx_fiq:

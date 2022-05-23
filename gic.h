@@ -25,7 +25,13 @@ typedef struct {
     const volatile uint8_t _reserved1;
     volatile uint32_t itargetsr[255]; // GICD_ITARGETSRn, 1 byte per interrupt ID
     const volatile uint8_t _reserved2;
-    volatile uint32_t icfgr[128];
+    volatile uint32_t icfgr[64];
+    const volatile uint8_t _reserved3[256];
+    volatile uint8_t nsacr[256];
+    volatile uint32_t sgir;
+    const volatile uint8_t _reserved4[12];
+    volatile uint32_t cpendsgir[4];
+    volatile uint32_t spendsgir[4];
 } gicd;
 
 typedef struct {
@@ -39,3 +45,4 @@ void gicd_init(gicd *dist);
 void gicd_enable_irq(gicd *dist, irq_id id);
 void gicd_disable_irq(gicd *dist, irq_id id);
 void gicc_init(gicc *cpu);
+void gicd_sgi(gicd *dist, irq_id id);

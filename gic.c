@@ -3,8 +3,6 @@
 void gicd_init(gicd *dist) {
     // Distributor is disabled on startup, but disable just in case
     dist->ctlr = GICD_CTRL_DISABLE;
-    
-    // TODO: what is the duplicity for?
 
     // Clear enable bit for every interrupt (0-1019)
     for (int i = 0; i < 32; i++) {
@@ -17,7 +15,7 @@ void gicd_init(gicd *dist) {
     }
 
     // Set priority for each interrupt
-    for (int i = 0; i < 255; i++) {
+    for (int i = 0; i < 512; i++) {
         dist->ipriorityr[i] = 0xffffffff;
     }
 
@@ -30,6 +28,8 @@ void gicd_init(gicd *dist) {
    for (int i = 0; i < 128; i++) {
        dist->icfgr[i] = 0x00000000;
    } 
+
+   dist->cpendsgir[3] = 0x01;
 
     // Enable GICD
     dist->ctlr = GICD_CTRL_ENABLE;
@@ -47,6 +47,10 @@ void gicd_disable_irq(gicd *dist, irq_id id) {
     dist->icenabler[index] = (1 << bit);
 }
 
+void gicd_sgi(gicd *dist, irq_id id) {
+    // send to cpu 0, check interrupt 0 <= i < 16
+    dist->sgir = (uint32_t) 65536 + 8;
+}
 
 void gicc_init(gicc *cpu) {
     cpu->ctlr = GICC_CTRL_DISABLE;
