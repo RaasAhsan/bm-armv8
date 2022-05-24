@@ -36,10 +36,11 @@ int kmain(void) {
     return 0;
 }
 
-void handle_irq() {
+// ISR (interrupt service routine) for peripherals
+void irq_handler() {
     uart_puts(u, "received interrupt!!\n");
 
-    uint16_t id = gicc_ia(cpu);
+    uint16_t id = gicc_acknowledge_interrupt(cpu);
     if ((id & GICC_IAR_ID_MASK) == GIC_SPURIOUS_INTERRUPT) {
         return;
     }
@@ -51,13 +52,15 @@ void handle_irq() {
         uart_puts(u, "Timer IRQ interrupt!!\n");
     } else if (id == INTERRUPT_UART) {
         uart_puts(u, "UART interrupt!!\n");
+        // TODO: handle statuses here
         char c = uart_getchar(u);
         uart_putchar(u, c);
+        uart_clear_interrupts(u);
     } else {
         uart_puts(u, "Unhandled IRQ!!\n");
     }
 
-    gicc_eoi(cpu, id);
+    gicc_end_interrupt(cpu, id);
 
     // char buf[16];
     // uart_gets(u, buf);

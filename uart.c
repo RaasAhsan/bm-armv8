@@ -1,6 +1,8 @@
 #include <stdint.h>
 #include "uart.h"
 
+#define UART_DR_DATA 0xff
+
 // control register bits
 #define UART_CR_RXE		(1 << 9)
 #define UART_CR_TXE		(1 << 8)
@@ -14,6 +16,9 @@
 // imsc register bits
 #define UART_IMSC_RTIM		(1 << 6)
 #define UART_IMSC_RXIM		(1 << 4)
+
+
+#define UART_IMC_ALL 0x7ff
 
 void uart_flush(uart *u) {
     while (!(u->fr & UART_FR_TXFE)) {
@@ -73,11 +78,7 @@ char uart_getchar(uart *u) {
     while (u->fr & UART_FR_RXFE) {
         ;
     }
-    char c = u->dr & 0xff;
-    // char buf[3];
-    // hextochar(buf, c);
-    // uart_puts(u, buf);
-    return c;
+    return (char) (u->dr & UART_DR_DATA);
 }
 
 void uart_puts(uart *u, const char *s) {
@@ -85,4 +86,8 @@ void uart_puts(uart *u, const char *s) {
         uart_putchar(u, *s);
         s++;
     }
+}
+
+void uart_clear_interrupts(uart *u) {
+    u->imsc = UART_IMC_ALL;
 }

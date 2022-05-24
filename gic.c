@@ -95,10 +95,10 @@ void gicc_init(gicc *cpu) {
     cpu->ctlr = GICC_CTRL_ENABLE;
 }
 
-uint32_t gicc_ia(gicc *cpu) {
+uint32_t gicc_acknowledge_interrupt(gicc *cpu) {
     return cpu->iar;
 }
 
-void gicc_eoi(gicc *cpu, uint16_t id) {
+void gicc_end_interrupt(gicc *cpu, uint16_t id) {
     cpu->eoir = (uint32_t) id;
 }

@@ -57,5 +57,5 @@ void gicd_set_config(gicd *dist, irq_id id, int config);
 void gicd_sgi(gicd *dist, irq_id id);
 
 void gicc_init(gicc *cpu);
-uint32_t gicc_ia(gicc *cpu);
-void gicc_eoi(gicc *cpu, uint16_t id);
+uint32_t gicc_acknowledge_interrupt(gicc *cpu);
+void gicc_end_interrupt(gicc *cpu, uint16_t id);
