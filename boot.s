@@ -73,7 +73,7 @@ curr_el_spx_sync:
     vector_entry_align
 curr_el_spx_irq:
     bl handle_irq
-    b .
+    eret
     vector_entry_align
 curr_el_spx_fiq:
     b .

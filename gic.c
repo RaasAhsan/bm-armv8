@@ -64,6 +64,7 @@ void gicd_set_priority(gicd *dist, irq_id id, uint8_t prio) {
     dist->ipriorityr[regn] = reg;
 }
 
+// Configures level-sensitivity/edge-triggering mode for each interrupt
 void gicd_set_config(gicd *dist, irq_id id, int config) {
     // 2 bits per interrupt
     int regn = id / 16;
@@ -92,4 +93,12 @@ void gicc_init(gicc *cpu) {
     // TODO: clear all interrupts
 
     cpu->ctlr = GICC_CTRL_ENABLE;
+}
+
+uint16_t gicc_ia(gicc *cpu) {
+    return (uint16_t) cpu->iar & 0x3ff;
+}
+
+void gicc_eoi(gicc *cpu, uint16_t id) {
+    cpu->eoir = (uint32_t) id;
 }

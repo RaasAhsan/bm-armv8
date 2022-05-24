@@ -6,6 +6,9 @@
 #define GICC_CTRL_ENABLE 0x0001
 #define GICC_CTRL_DISABLE 0x0000
 
+#define GIC_SPURIOUS_INTERRUPT 0x3FF
+#define GICC_IAR_ID_MASK 0x3FF
+
 typedef uint16_t irq_id;
 
 // Definition of GIC Distributor register map
@@ -39,6 +42,7 @@ typedef struct {
     volatile uint32_t pmr; // GICC_PMR
     volatile uint32_t bpr; // GICC_BPR
     const volatile uint32_t iar; // GICC_IAR
+    volatile uint32_t eoir; // GICC_EOIR
 } gicc;
 
 void gicd_init(gicd *dist);
@@ -47,8 +51,8 @@ void gicd_disable_irq(gicd *dist, irq_id id);
 void gicd_clear_pending(gicd *dist, irq_id id);
 void gicd_set_priority(gicd *dist, irq_id id, uint8_t prio);
 void gicd_set_config(gicd *dist, irq_id id, int config);
+void gicd_sgi(gicd *dist, irq_id id);
 
 void gicc_init(gicc *cpu);
-
-
-void gicd_sgi(gicd *dist, irq_id id);
+uint16_t gicc_ia(gicc *cpu);
+void gicc_eoi(gicc *cpu, uint16_t id);
