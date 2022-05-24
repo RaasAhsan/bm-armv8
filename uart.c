@@ -73,10 +73,10 @@ char uart_getchar(uart *u) {
     while (u->fr & UART_FR_RXFE) {
         ;
     }
-    char buf[3];
     char c = u->dr & 0xff;
-    hextochar(buf, c);
-    uart_puts(u, buf);
+    // char buf[3];
+    // hextochar(buf, c);
+    // uart_puts(u, buf);
     return c;
 }
 

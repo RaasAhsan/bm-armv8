@@ -95,8 +95,8 @@ void gicc_init(gicc *cpu) {
     cpu->ctlr = GICC_CTRL_ENABLE;
 }
 
-uint16_t gicc_ia(gicc *cpu) {
-    return (uint16_t) cpu->iar & 0x3ff;
+uint32_t gicc_ia(gicc *cpu) {
+    return cpu->iar;
 }
 
 void gicc_eoi(gicc *cpu, uint16_t id) {

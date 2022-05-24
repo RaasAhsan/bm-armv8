@@ -16,6 +16,8 @@ typedef struct {
     volatile uint32_t cr;
     volatile uint32_t ifls;
     volatile uint32_t imsc;
+    volatile uint32_t ris;
+    volatile uint32_t mis;
 } uart;
 
 void uart_init(uart *u);

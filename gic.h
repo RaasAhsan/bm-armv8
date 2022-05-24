@@ -9,6 +9,9 @@
 #define GIC_SPURIOUS_INTERRUPT 0x3FF
 #define GICC_IAR_ID_MASK 0x3FF
 
+#define GICD_LEVEL_SENSITIVE 0x0
+#define GICD_EDGE_TRIGGERED 0x1
+
 typedef uint16_t irq_id;
 
 // Definition of GIC Distributor register map
@@ -54,5 +57,5 @@ void gicd_set_config(gicd *dist, irq_id id, int config);
 void gicd_sgi(gicd *dist, irq_id id);
 
 void gicc_init(gicc *cpu);
-uint16_t gicc_ia(gicc *cpu);
+uint32_t gicc_ia(gicc *cpu);
 void gicc_eoi(gicc *cpu, uint16_t id);

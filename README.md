@@ -10,6 +10,7 @@ objcopy -O binary kernel.elf kernel.bin && \
 
 ```
 x /4096 0x08000000
+x /256 0x08000000
 ```
 
 ### Timers
