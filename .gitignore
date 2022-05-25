@@ -2,3 +2,6 @@
 *.elf
 *.bin
 *.dump
+
+target
+Cargo.lock

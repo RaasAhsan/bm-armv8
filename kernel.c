@@ -7,9 +7,9 @@ const uintptr_t uart0_ptr = (uintptr_t) 0x09000000;
 const uintptr_t gicd_ptr = (uintptr_t) 0x08000000;
 const uintptr_t gicc_ptr = (uintptr_t) 0x08010000; 
 
-gicd *dist = (gicd*) gicd_ptr; 
-gicc *cpu = (gicc*) gicc_ptr;
-uart *u = (uart*) uart0_ptr;
+static gicd *dist = (gicd*) gicd_ptr; 
+static gicc *cpu = (gicc*) gicc_ptr;
+static uart *u = (uart*) uart0_ptr;
 
 #define INTERRUPT_SGI 8
 #define TIMER_INTERRUPT 27
@@ -32,6 +32,9 @@ int kmain(void) {
     gicd_set_priority(dist, INTERRUPT_UART, 0x00);
     gicd_set_config(dist, INTERRUPT_UART, GICD_EDGE_TRIGGERED);
     gicd_enable_irq(dist, INTERRUPT_UART);
+
+    uint8_t out = register_driver();
+    uart_putchar(u, 0x30 + (char) out);
 
     return 0;
 }

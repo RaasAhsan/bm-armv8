@@ -27,3 +27,5 @@ char uart_getchar(uart *u);
 void uart_gets(uart *u, char *buf);
 void uart_puts(uart *u, const char *s);
 void uart_clear_interrupts(uart *u);
+
+uint8_t register_driver();
