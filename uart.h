@@ -22,7 +22,7 @@ typedef struct {
 } uart;
 
 void uart_init(uart *u);
-void uart_putchar(uart *u, char c);
+void uart_putchar(char c);
 char uart_getchar();
 void uart_gets(uart *u, char *buf);
 void uart_puts(uart *u, const char *s);

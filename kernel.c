@@ -47,14 +47,14 @@ void irq_handler() {
 
     if (id == INTERRUPT_SGI) {
         uart_puts(u, "SGI IRQ interrupt!!\n");
-        uart_putchar(u, (char)id + 0x30);
+        uart_putchar((char)id + 0x30);
     } else if (id == TIMER_INTERRUPT) {
         uart_puts(u, "Timer IRQ interrupt!!\n");
     } else if (id == INTERRUPT_UART) {
         uart_puts(u, "UART interrupt!!\n");
         // TODO: handle statuses here
         char c = uart_getchar();
-        uart_putchar(u, c);
+        uart_putchar(c);
         // uart_clear_interrupts(u);
     } else {
         uart_puts(u, "Unhandled IRQ!!\n");

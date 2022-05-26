@@ -38,14 +38,6 @@ void uart_init(uart *u) {
     uart_flush(u);
 }
 
-void uart_putchar(uart *u, char c) {
-    u->dr = c;
-
-    while (u->fr & UART_FR_TXFF) {
-        ;
-    }
-}
-
 void hextochar(char *buf, uint8_t in) {
     uint8_t left = (in >> 4) & 0xf;
     if (left <= 9)  {
@@ -65,7 +57,7 @@ void hextochar(char *buf, uint8_t in) {
 void uart_gets(uart *u, char *buf) {
     char c = uart_getchar();
     while (c != '\n') {
-        uart_putchar(u, 'A');
+        uart_putchar('A');
         *buf = c;
         buf++;
         c = uart_getchar();
@@ -76,7 +68,7 @@ void uart_gets(uart *u, char *buf) {
 
 void uart_puts(uart *u, const char *s) {
     while (*s != '\0') {
-        uart_putchar(u, *s);
+        uart_putchar(*s);
         s++;
     }
 }
