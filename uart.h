@@ -23,9 +23,7 @@ typedef struct {
 
 void uart_init(uart *u);
 void uart_putchar(uart *u, char c);
-char uart_getchar(uart *u);
+char uart_getchar();
 void uart_gets(uart *u, char *buf);
 void uart_puts(uart *u, const char *s);
 void uart_clear_interrupts(uart *u);
-
-uint8_t register_driver();

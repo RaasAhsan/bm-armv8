@@ -33,10 +33,7 @@ int kmain(void) {
     gicd_set_config(dist, INTERRUPT_UART, GICD_EDGE_TRIGGERED);
     gicd_enable_irq(dist, INTERRUPT_UART);
 
-    uint8_t out = register_driver();
-    uart_putchar(u, 0x30 + (char) out);
-
-    return 0;
+    return sizeof(uart);
 }
 
 // ISR (interrupt service routine) for peripherals
@@ -56,9 +53,9 @@ void irq_handler() {
     } else if (id == INTERRUPT_UART) {
         uart_puts(u, "UART interrupt!!\n");
         // TODO: handle statuses here
-        char c = uart_getchar(u);
+        char c = uart_getchar();
         uart_putchar(u, c);
-        uart_clear_interrupts(u);
+        // uart_clear_interrupts(u);
     } else {
         uart_puts(u, "Unhandled IRQ!!\n");
     }

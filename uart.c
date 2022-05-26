@@ -63,22 +63,15 @@ void hextochar(char *buf, uint8_t in) {
 }
 
 void uart_gets(uart *u, char *buf) {
-    char c = uart_getchar(u);
+    char c = uart_getchar();
     while (c != '\n') {
         uart_putchar(u, 'A');
         *buf = c;
         buf++;
-        c = uart_getchar(u);
+        c = uart_getchar();
     }
     *buf = '\0';
     uart_puts(u, "\r\n");
-}
-
-char uart_getchar(uart *u) {
-    while (u->fr & UART_FR_RXFE) {
-        ;
-    }
-    return (char) (u->dr & UART_DR_DATA);
 }
 
 void uart_puts(uart *u, const char *s) {
