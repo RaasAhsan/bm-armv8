@@ -19,6 +19,9 @@ _start:
     // Turn off IRQ/FIQ masks
     msr daifclr, #0b0011
 
+    mov x13, 8
+    mov x14, 9
+
     bl kmain
 
     // ldr x14, =0xdeadbeef
@@ -33,10 +36,11 @@ _start:
     // msr cntv_tval_el0, x25
     //mrs x17, cntv_tval_el0
     //mrs x18, cntv_cval_el0
+    mov x8, 10
 foo:
     // mrs x12, SPSel
-    ldr x10, =1
-    ldr x10, =2
+    mov x10, 8
+    mov x10, 9
     // svc #1
     b foo
 test:
@@ -72,7 +76,32 @@ curr_el_spx_sync:
     b .
     vector_entry_align
 curr_el_spx_irq:
+    sub sp, sp, #160 
+    stp x0, x1, [sp, #0]
+    stp x2, x3, [sp, #16]
+    stp x4, x5, [sp, #32]
+    stp x6, x7, [sp, #48]
+    stp x8, x9, [sp, #64]
+    stp x10, x11, [sp, #80]
+    stp x12, x13, [sp, #96]
+    stp x14, x15, [sp, #112]
+    stp x16, x17, [sp, #128]
+    stp x18, x30, [sp, #144]
+
     bl irq_handler
+
+    ldp x0, x1, [sp, #0]
+    ldp x2, x3, [sp, #16]
+    ldp x4, x5, [sp, #32]
+    ldp x6, x7, [sp, #48]
+    ldp x8, x9, [sp, #64]
+    ldp x10, x11, [sp, #80]
+    ldp x12, x13, [sp, #96]
+    ldp x14, x15, [sp, #112]
+    ldp x16, x17, [sp, #128]
+    ldp x18, x30, [sp, #144]
+    add sp, sp, #160
+
     eret
     vector_entry_align
 curr_el_spx_fiq:
