@@ -3,41 +3,6 @@
 
 #define UART_DR_DATA 0xff
 
-// control register bits
-#define UART_CR_RXE		(1 << 9)
-#define UART_CR_TXE		(1 << 8)
-#define UART_CR_UARTEN  (1 << 0)
-
-// flag register bits
-#define UART_FR_TXFE	(1 << 7) // transmit fifo empty
-#define UART_FR_RXFE	(1 << 4) // receive fifo empty
-#define UART_FR_TXFF	(1 << 5) // transmit fifo full
-
-// imsc register bits
-#define UART_IMSC_RTIM		(1 << 6)
-#define UART_IMSC_RXIM		(1 << 4)
-
-
-#define UART_IMC_ALL 0x7ff
-
-void uart_flush(uart *u) {
-    while (!(u->fr & UART_FR_TXFE)) {
-        ;
-    }
-}
-
-void uart_init(uart *u) {
-    u->cr = 0x00;
-
-    // Enable interrupts
-    u->imsc = UART_IMSC_RXIM | UART_IMSC_RTIM;
-
-    // Enable uart and rx/tx
-    u->cr = UART_CR_UARTEN | UART_CR_RXE | UART_CR_TXE;
-
-    uart_flush(u);
-}
-
 void hextochar(char *buf, uint8_t in) {
     uint8_t left = (in >> 4) & 0xf;
     if (left <= 9)  {
@@ -54,7 +19,7 @@ void hextochar(char *buf, uint8_t in) {
     buf[2] = '\0';
 }
 
-void uart_gets(uart *u, char *buf) {
+void uart_gets(char *buf) {
     char c = uart_getchar();
     while (c != '\n') {
         uart_putchar('A');
@@ -63,16 +28,12 @@ void uart_gets(uart *u, char *buf) {
         c = uart_getchar();
     }
     *buf = '\0';
-    uart_puts(u, "\r\n");
+    uart_puts("\r\n");
 }
 
-void uart_puts(uart *u, const char *s) {
+void uart_puts(const char *s) {
     while (*s != '\0') {
         uart_putchar(*s);
         s++;
     }
-}
-
-void uart_clear_interrupts(uart *u) {
-    u->imsc = UART_IMC_ALL;
 }
