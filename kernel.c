@@ -46,9 +46,9 @@ int kmain(void) {
     gicd_set_config(dist, INTERRUPT_TIMER, GICD_LEVEL_SENSITIVE);
     gicd_enable_irq(dist, INTERRUPT_TIMER);
 
-    uart_puts("Initialization complete!\r\n");
+    timer_sleep(5000000);
 
-    timer_sleep(10000000);
+    uart_puts("Initialization complete!\r\n");
 
     return 0;
 }

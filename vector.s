@@ -34,6 +34,40 @@ curr_el_spx_sync:
     b .
     vector_entry_align
 curr_el_spx_irq:
+    b handle_interrupt
+    vector_entry_align
+curr_el_spx_fiq:
+    b .
+    vector_entry_align
+curr_el_spx_serror:
+    mrs x22, esr_el1
+    b .
+
+    // Lower EL using AArch64
+    vector_entry_align
+lower_el_sync:
+    b .
+    vector_entry_align
+lower_el_irq:
+    b handle_interrupt
+    vector_entry_align
+lower_el_fiq:
+    b .
+    vector_entry_align
+lower_el_serror:
+    b .
+
+    // Lower EL using AArch32
+    vector_entry_align
+    b .
+    vector_entry_align
+    b .
+    vector_entry_align
+    b .
+    vector_entry_align
+    b .
+
+handle_interrupt:
     sub sp, sp, #160 
     stp x0, x1, [sp, #0]
     stp x2, x3, [sp, #16]
@@ -61,29 +95,3 @@ curr_el_spx_irq:
     add sp, sp, #160
 
     eret
-    vector_entry_align
-curr_el_spx_fiq:
-    b .
-    vector_entry_align
-curr_el_spx_serror:
-    b .
-
-    // Lower EL using AArch64
-    vector_entry_align
-    b .
-    vector_entry_align
-    b .
-    vector_entry_align
-    b .
-    vector_entry_align
-    b .
-
-    // Lower EL using AArch32
-    vector_entry_align
-    b .
-    vector_entry_align
-    b .
-    vector_entry_align
-    b .
-    vector_entry_align
-    b .
