@@ -1,3 +1,3 @@
 [workspace]
 
-members = ["pl011"]
+members = ["pl011", "timer", "kernel"]

@@ -64,8 +64,3 @@ pub extern "C" fn uart_clear_interrupts() {
         core::ptr::write_volatile(UART_ICR, UART_ICR_ALL);
     }
 }
-
-#[panic_handler]
-fn panic_handler(_info: &core::panic::PanicInfo) -> ! {
-    loop {}
-}

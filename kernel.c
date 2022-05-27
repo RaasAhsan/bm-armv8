@@ -3,6 +3,8 @@
 #include "uart.h"
 #include "gic.h"
 
+#include "timer.h"
+
 const uintptr_t gicd_ptr = (uintptr_t) 0x08000000;
 const uintptr_t gicc_ptr = (uintptr_t) 0x08010000; 
 
@@ -45,6 +47,8 @@ int kmain(void) {
     gicd_enable_irq(dist, INTERRUPT_TIMER);
 
     uart_puts("Initialization complete!\r\n");
+
+    timer_sleep(10000000);
 
     return 0;
 }
