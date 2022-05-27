@@ -11,9 +11,6 @@ _start:
     // Turn off IRQ/FIQ masks
     msr daifclr, #0b0011
 
-    mov x13, 8
-    mov x14, 9
-
     bl kmain
 
     mrs x17, cntfrq_el0
