@@ -1,9 +1,11 @@
 #include <stdint.h>
 
+#include "kernel.h"
 #include "uart.h"
 #include "gic.h"
 
 #include "timer.h"
+#include "scheduler.h"
 
 const uintptr_t gicd_ptr = (uintptr_t) 0x08000000;
 const uintptr_t gicc_ptr = (uintptr_t) 0x08010000; 
@@ -14,6 +16,27 @@ static gicc *cpu = (gicc*) gicc_ptr;
 #define INTERRUPT_SGI 8
 #define INTERRUPT_TIMER 27
 #define INTERRUPT_UART 33
+
+
+void process_a(void) {
+    while (1) {
+        __asm ("msr daifset, #0b0011");
+        timer_sleep(10000);
+        uart_putchar('A');
+        __asm ("msr daifclr, #0b0011");
+        // timer_sleep(1000000);
+    }
+}
+
+void process_b(void) {
+    while (1) {
+        __asm ("msr daifset, #0b0011");
+        timer_sleep(10000);
+        uart_putchar('B');
+        __asm ("msr daifclr, #0b0011");
+        // timer_sleep(1000000);
+    }
+}
 
 int kmain(void) {
     uart_init();
@@ -46,14 +69,18 @@ int kmain(void) {
     gicd_set_config(dist, INTERRUPT_TIMER, GICD_LEVEL_SENSITIVE);
     gicd_enable_irq(dist, INTERRUPT_TIMER);
 
-    timer_sleep(5000000);
+    uart_puts("Initialized timer...\r\n");
+
+    // timer_sleep(5000000);
 
     uart_puts("Initialization complete!\r\n");
 
+    scheduler_create_process(process_a);
+    scheduler_create_process(process_b);
+    // scheduler_create_process(process_a);
+
     return 0;
 }
-
-void reset_timer();
 
 // ISR (interrupt service routine) for peripherals
 void irq_handler() {
@@ -65,9 +92,13 @@ void irq_handler() {
     if (id == INTERRUPT_SGI) {
         uart_puts("SGI IRQ interrupt!!\n");
         uart_putchar((char)id + 0x30);
+        gicc_end_interrupt(cpu, id);
     } else if (id == INTERRUPT_TIMER) {
-        uart_puts("Timer IRQ interrupt!!\n");
-        reset_timer();
+        // uart_puts("Timer IRQ interrupt!!\n");
+        timer_reset();
+        gicc_end_interrupt(cpu, id);
+
+        scheduler_switch_process();
     } else if (id == INTERRUPT_UART) {
         uart_puts("UART interrupt!!\n");
         // TODO: handle statuses here
@@ -75,11 +106,11 @@ void irq_handler() {
         uart_putchar(c);
         // TODO: this doesn't seem to be necessary
         uart_clear_interrupts();
+        gicc_end_interrupt(cpu, id);
     } else {
         uart_puts("Unhandled IRQ!!\n");
+        gicc_end_interrupt(cpu, id);
     }
-
-    gicc_end_interrupt(cpu, id);
 
     // char buf[16];
     // uart_gets(u, buf);

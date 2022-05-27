@@ -79,6 +79,7 @@ handle_interrupt:
     stp x14, x15, [sp, #112]
     stp x16, x17, [sp, #128]
     stp x18, x30, [sp, #144]
+    mov x25, x30
 
     bl irq_handler
 

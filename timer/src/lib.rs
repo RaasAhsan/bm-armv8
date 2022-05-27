@@ -19,6 +19,12 @@ pub extern "C" fn timer_sleep(micros: u64) {
     }
 }
 
+#[no_mangle]
+pub extern "C" fn timer_reset() {
+    let freq = get_timer_frequency();
+    set_virtual_timer_value(freq);
+}
+
 // TODO: volatile implied ?
 
 fn get_timer_frequency() -> u64 {
@@ -34,5 +40,11 @@ fn get_system_count() -> u64 {
         let time: u64;
         asm!("mrs {0}, cntpct_el0", out(reg) time);
         return time;
+    }
+}
+
+fn set_virtual_timer_value(count: u64) {
+    unsafe {
+        asm!("msr cntv_tval_el0, {}", in(reg) count);
     }
 }

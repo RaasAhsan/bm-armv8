@@ -19,7 +19,7 @@ _start:
 
     // Initialize timer
     mrs x21, cntv_ctl_el0
-    // orr x21, x21, #0x00000001 // turn on enable bit
+    orr x21, x21, #0x00000001 // turn on enable bit
     and x21, x21, #0xfffffffffffffffd // turn off mask bit
     msr cntv_ctl_el0, x21
 
@@ -29,11 +29,11 @@ _start:
     //mrs x18, cntv_cval_el0
 
     // Drop to EL0
-    adr x18, foo
-    msr elr_el1, x18
-    mov x19, xzr
-    msr spsr_el1, x19
-    eret
+    // adr x18, foo
+    // msr elr_el1, x18
+    // mov x19, xzr
+    // msr spsr_el1, x19
+    // eret
 foo:
     // mrs x12, SPSel
     mov x10, 8
