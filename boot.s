@@ -16,19 +16,20 @@ _start:
 
     bl kmain
 
+    mrs x17, cntfrq_el0
+
     // ldr x14, =0xdeadbeef
 
     // Initialize timer
-    //mrs x21, cntv_ctl_el0 // read ctl
-    //ldr x15, =0x1
-    //orr x21, x21, x15 // turn on enable bit
-    //msr cntv_ctl_el0, x21 // write ctl
+    mrs x21, cntv_ctl_el0
+    orr x21, x21, #0x00000001 // turn on enable bit
+    and x21, x21, #0xfffffffffffffffd // turn off mask bit
+    msr cntv_ctl_el0, x21
 
-    // ldr x25, =2000
-    // msr cntv_tval_el0, x25
+    ldr x25, =62500000
+    msr cntv_tval_el0, x25
     //mrs x17, cntv_tval_el0
     //mrs x18, cntv_cval_el0
-    mov x8, 10
 foo:
     // mrs x12, SPSel
     mov x10, 8
@@ -41,3 +42,9 @@ test:
     ldr x25, =1000
     msr cntv_tval_el0, x25
     mrs x24, cntv_cval_el0
+
+.global reset_timer
+reset_timer:
+    ldr x25, =62500000
+    msr cntv_tval_el0, x25
+    ret

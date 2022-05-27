@@ -10,7 +10,7 @@ static gicd *dist = (gicd*) gicd_ptr;
 static gicc *cpu = (gicc*) gicc_ptr;
 
 #define INTERRUPT_SGI 8
-#define TIMER_INTERRUPT 27
+#define INTERRUPT_TIMER 27
 #define INTERRUPT_UART 33
 
 int kmain(void) {
@@ -39,15 +39,20 @@ int kmain(void) {
 
     uart_puts("Registered UART interrupt...\r\n");
 
+    gicd_clear_pending(dist, INTERRUPT_TIMER);
+    gicd_set_priority(dist, INTERRUPT_TIMER, 0x00);
+    gicd_set_config(dist, INTERRUPT_TIMER, GICD_LEVEL_SENSITIVE);
+    gicd_enable_irq(dist, INTERRUPT_TIMER);
+
     uart_puts("Initialization complete!\r\n");
 
     return 0;
 }
 
+void reset_timer();
+
 // ISR (interrupt service routine) for peripherals
 void irq_handler() {
-    uart_puts("received interrupt!!\n");
-
     uint16_t id = gicc_acknowledge_interrupt(cpu);
     if ((id & GICC_IAR_ID_MASK) == GIC_SPURIOUS_INTERRUPT) {
         return;
@@ -56,8 +61,9 @@ void irq_handler() {
     if (id == INTERRUPT_SGI) {
         uart_puts("SGI IRQ interrupt!!\n");
         uart_putchar((char)id + 0x30);
-    } else if (id == TIMER_INTERRUPT) {
+    } else if (id == INTERRUPT_TIMER) {
         uart_puts("Timer IRQ interrupt!!\n");
+        reset_timer();
     } else if (id == INTERRUPT_UART) {
         uart_puts("UART interrupt!!\n");
         // TODO: handle statuses here

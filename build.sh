@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cargo build --release && 
+cargo build --release && \
 as boot.s -o boot.o && \
 as vector.s -o vector.o && \
 gcc -ffreestanding -c kernel.c -o kernel.o && \
