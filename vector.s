@@ -46,7 +46,7 @@ curr_el_spx_serror:
     // Lower EL using AArch64
     vector_entry_align
 lower_el_sync:
-    b .
+    b handle_lower_sync
     vector_entry_align
 lower_el_irq:
     b handle_interrupt
@@ -67,7 +67,7 @@ lower_el_serror:
     vector_entry_align
     b .
 
-handle_interrupt:
+.macro spill_registers
     sub sp, sp, #160 
     stp x0, x1, [sp, #0]
     stp x2, x3, [sp, #16]
@@ -80,9 +80,9 @@ handle_interrupt:
     stp x16, x17, [sp, #128]
     stp x18, x30, [sp, #144]
     mov x25, x30
+.endm
 
-    bl irq_handler
-
+.macro reload_registers
     ldp x0, x1, [sp, #0]
     ldp x2, x3, [sp, #16]
     ldp x4, x5, [sp, #32]
@@ -94,5 +94,16 @@ handle_interrupt:
     ldp x16, x17, [sp, #128]
     ldp x18, x30, [sp, #144]
     add sp, sp, #160
+.endm
 
+handle_lower_sync:
+    spill_registers
+    bl sync_handler
+    reload_registers
+    eret
+
+handle_interrupt:
+    spill_registers
+    bl irq_handler
+    reload_registers
     eret

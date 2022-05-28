@@ -1,6 +1,7 @@
 #include "scheduler.h"
 #include "kernel.h"
 #include "uart.h"
+#include "exception.h"
 
 #define MAX_PROCESSES 128
 
@@ -39,8 +40,8 @@ void scheduler_switch_process() {
     }
 
     process *current = &processes[active_process_idx];
-    current->pc = get_elr_el1();
-    current->lr = get_lr();
+    // current->pc = get_elr_el1();
+    // current->lr = get_lr();
     current->status = PAUSED;
 
     active_process_idx += 1;
@@ -50,7 +51,7 @@ void scheduler_switch_process() {
 }
 
 void scheduler_resume_process(process *p) {
-    set_elr_el1(p->pc);
+    // set_elr_el1(p->pc);
 
     p->status = RUNNING;
 
@@ -59,9 +60,5 @@ void scheduler_resume_process(process *p) {
     __asm ("mov x30, %[lr]" : : [lr] "r" (p->lr));
 
     uart_putchar(0x30 + p->pid);
-    __asm ("eret");
-
-    p->status = EXITED;
-
-    // TODO: go to next process?
+    return_from_exception();
 }

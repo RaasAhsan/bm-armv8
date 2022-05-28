@@ -29,11 +29,13 @@ _start:
     //mrs x18, cntv_cval_el0
 
     // Drop to EL0
-    // adr x18, foo
-    // msr elr_el1, x18
-    // mov x19, xzr
-    // msr spsr_el1, x19
-    // eret
+    adr x18, user_process
+    msr elr_el1, x18
+    mov x19, xzr
+    msr spsr_el1, x19
+    ldr x20, =0x40200000
+    msr sp_el0, x20
+    eret
 foo:
     // mrs x12, SPSel
     mov x10, 8

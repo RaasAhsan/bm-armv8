@@ -16,7 +16,6 @@ const UART_FR_TXFF: u32 = 1 << 5; // transmit fifo full
 
 const UART_ICR_ALL: u32 = 0x7ff;
 
-
 // IMSC register bits
 const UART_IMSC_RTIM: u32 = 1 << 6;
 const UART_IMSC_RXIM: u32 = 1 << 4;
@@ -27,9 +26,7 @@ const UART_CR_TXE: u32 = 1 << 8;
 const UART_CR_UARTEN: u32 = 1 << 0;
 
 fn uart_flush() {
-    unsafe {
-        while core::ptr::read_volatile(UART_FR) & UART_FR_TXFE == 0 {}
-    }
+    unsafe { while core::ptr::read_volatile(UART_FR) & UART_FR_TXFE == 0 {} }
 }
 
 #[no_mangle]

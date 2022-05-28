@@ -6,6 +6,8 @@
 
 #include "timer.h"
 #include "scheduler.h"
+#include "syscall.h"
+#include "exception.h"
 
 const uintptr_t gicd_ptr = (uintptr_t) 0x08000000;
 const uintptr_t gicc_ptr = (uintptr_t) 0x08010000; 
@@ -16,6 +18,15 @@ static gicc *cpu = (gicc*) gicc_ptr;
 #define INTERRUPT_SGI 8
 #define INTERRUPT_TIMER 27
 #define INTERRUPT_UART 33
+
+void user_process(void) {
+    while (1) {
+        syscall(8);
+        // int a = 2;
+        // int b = a + 3;
+        // int c = b * a; 
+    }
+}
 
 
 void process_a(void) {
@@ -75,8 +86,8 @@ int kmain(void) {
 
     uart_puts("Initialization complete!\r\n");
 
-    scheduler_create_process(process_a);
-    scheduler_create_process(process_b);
+    // scheduler_create_process(process_a);
+    // scheduler_create_process(process_b);
     // scheduler_create_process(process_a);
 
     return 0;
@@ -115,4 +126,15 @@ void irq_handler() {
     // char buf[16];
     // uart_gets(u, buf);
     // uart_puts(u, buf);
+}
+
+void sync_handler() {
+    uint8_t ec = get_exception_class();
+
+    if (ec == EXCEPTION_SVC) {
+        // long syscall = get_syscall_number();
+        // if (syscall == 8) {
+            uart_putchar('A');
+        // }
+    }
 }

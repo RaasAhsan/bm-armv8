@@ -1,0 +1,20 @@
+use core::arch::asm;
+
+#[no_mangle]
+pub extern "C" fn svc_syscall(number: u64) -> i64 {
+    unsafe {
+        let ret: i64;
+        asm!("mov x8, {}", "svc #0", "mov {}, x0", in(reg) number, out(reg) ret);
+        return ret;
+    }
+}
+
+
+#[no_mangle]
+pub extern "C" fn get_syscall_number() -> i64 {
+    unsafe {
+        let num: i64;
+        asm!("mov {}, x8", out(reg) num);
+        return num;
+    }
+}
