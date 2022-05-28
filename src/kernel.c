@@ -22,7 +22,7 @@ static gicc *cpu = (gicc*) gicc_ptr;
 
 void user_process(void) {
     while (1) {
-        syscall(8);
+        syscall(8, 'a', 'b');
         // int a = 2;
         // int b = a + 3;
         // int c = b * a; 
@@ -135,7 +135,7 @@ void sync_handler() {
     if (ec == EXCEPTION_SVC) {
         long syscall = process_get_trap_frame()->x8;
         if (syscall == 8) {
-            uart_putchar('A');
+            uart_putchar((char) process_get_trap_frame()->x0);
         }
     }
 }
