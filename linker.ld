@@ -1,7 +1,7 @@
 ENTRY(_start)
 SECTIONS {
     . = 0x40080000;
-    .startup . : { boot.o(.text) }
+    .startup . : { out/boot.o(.text) }
     .text : { *(.text) }
     .data : { *(.data) }
     .bss : { *(.bss COMMON) }
