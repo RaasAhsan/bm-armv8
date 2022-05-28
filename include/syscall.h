@@ -7,6 +7,4 @@
 
 long syscall(uint64_t);
 
-long get_syscall_number(void);
-
 #endif

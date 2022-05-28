@@ -21,7 +21,7 @@ void scheduler_create_process(void (*start)(void)) {
     process p;
     p.pid = (uint8_t) process_id;
     p.status = CREATED;
-    p.pc = (uintptr_t) start;
+    // p.pc = (uintptr_t) start;
 
     processes[process_id] = p;
     process_id++;
@@ -57,7 +57,7 @@ void scheduler_resume_process(process *p) {
 
     // drop_privilege();
 
-    __asm ("mov x30, %[lr]" : : [lr] "r" (p->lr));
+    // __asm ("mov x30, %[lr]" : : [lr] "r" (p->lr));
 
     uart_putchar(0x30 + p->pid);
     return_from_exception();

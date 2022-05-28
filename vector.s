@@ -67,7 +67,7 @@ lower_el_serror:
     vector_entry_align
     b .
 
-.macro spill_registers
+.macro set_trap_frame
     sub sp, sp, #160 
     stp x0, x1, [sp, #0]
     stp x2, x3, [sp, #16]
@@ -80,9 +80,13 @@ lower_el_serror:
     stp x16, x17, [sp, #128]
     stp x18, x30, [sp, #144]
     mov x25, x30
+
+    // Set the trap frame for the current process
+    mov x0, sp // aarch64 calling convention: first arg is in x0
+    bl process_set_trap_frame
 .endm
 
-.macro reload_registers
+.macro restore_trap_frame
     ldp x0, x1, [sp, #0]
     ldp x2, x3, [sp, #16]
     ldp x4, x5, [sp, #32]
@@ -97,13 +101,13 @@ lower_el_serror:
 .endm
 
 handle_lower_sync:
-    spill_registers
+    set_trap_frame
     bl sync_handler
-    reload_registers
+    restore_trap_frame
     eret
 
 handle_interrupt:
-    spill_registers
+    set_trap_frame
     bl irq_handler
-    reload_registers
+    restore_trap_frame
     eret

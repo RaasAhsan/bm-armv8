@@ -8,40 +8,24 @@ _start:
     ldr x20, =vectors
     msr vbar_el1, x20
 
-    // Turn off IRQ/FIQ masks
-    msr daifclr, #0b0011
-
     bl kmain
-
-    mrs x17, cntfrq_el0
-
-    // ldr x14, =0xdeadbeef
 
     // Initialize timer
     mrs x21, cntv_ctl_el0
-    orr x21, x21, #0x00000001 // turn on enable bit
+    // orr x21, x21, #0x00000001 // turn on enable bit
     and x21, x21, #0xfffffffffffffffd // turn off mask bit
     msr cntv_ctl_el0, x21
 
-    // ldr x25, =62500000
-    // msr cntv_tval_el0, x25
-    //mrs x17, cntv_tval_el0
-    //mrs x18, cntv_cval_el0
 
     // Drop to EL0
+    // msr daifclr, #0b0011 // disable irq/fiq mask
     adr x18, user_process
-    msr elr_el1, x18
-    mov x19, xzr
-    msr spsr_el1, x19
-    ldr x20, =0x40200000
-    msr sp_el0, x20
+    msr elr_el1, x18 // set link after return to user process
+    mov x19, xzr // set exception level after return to el0, if to 0
+    msr spsr_el1, x19 
+    ldr x20, =0x40202000
+    msr sp_el0, x20 // set stack pointer
     eret
-foo:
-    // mrs x12, SPSel
-    mov x10, 8
-    mov x10, 9
-    // svc #1
-    b foo
 
 .global reset_timer
 reset_timer:

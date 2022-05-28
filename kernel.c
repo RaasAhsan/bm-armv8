@@ -7,6 +7,7 @@
 #include "timer.h"
 #include "scheduler.h"
 #include "syscall.h"
+#include "process.h"
 #include "exception.h"
 
 const uintptr_t gicd_ptr = (uintptr_t) 0x08000000;
@@ -132,9 +133,9 @@ void sync_handler() {
     uint8_t ec = get_exception_class();
 
     if (ec == EXCEPTION_SVC) {
-        // long syscall = get_syscall_number();
-        // if (syscall == 8) {
+        long syscall = process_get_trap_frame()->x8;
+        if (syscall == 8) {
             uart_putchar('A');
-        // }
+        }
     }
 }
