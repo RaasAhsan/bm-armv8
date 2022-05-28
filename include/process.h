@@ -32,18 +32,17 @@ typedef struct trap_frame {
     uint64_t x17;
     uint64_t x18;
     uint64_t x30;
+    uintptr_t sp;
 } trap_frame;
 
 typedef struct process {
     uint8_t pid;
     process_status status;
     uintptr_t program_counter;
-    uint8_t* stack;
     trap_frame* trapframe;
 } process;
 
 trap_frame* process_get_trap_frame(void);
 void process_set_trap_frame(uintptr_t);
-void process_set_stack(uintptr_t);
 
 #endif

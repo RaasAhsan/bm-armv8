@@ -68,7 +68,7 @@ lower_el_serror:
     b .
 
 .macro enter_trap
-    sub sp, sp, #160 
+    sub sp, sp, #176 
     stp x0, x1, [sp, #0]
     stp x2, x3, [sp, #16]
     stp x4, x5, [sp, #32]
@@ -79,15 +79,12 @@ lower_el_serror:
     stp x14, x15, [sp, #112]
     stp x16, x17, [sp, #128]
     stp x18, x30, [sp, #144]
-    mov x25, x30
+    mov x0, sp
+    stp x0, xzr, [sp, #160]
 
     // Set the trap frame for the current process
     mov x0, sp // aarch64 calling convention: first arg is in x0
     bl process_set_trap_frame
-
-    // Set the top of stack for the current process
-    mrs x0, sp_el0
-    bl process_set_stack
 .endm
 
 .macro restore_trap
@@ -101,7 +98,7 @@ lower_el_serror:
     ldp x14, x15, [sp, #112]
     ldp x16, x17, [sp, #128]
     ldp x18, x30, [sp, #144]
-    add sp, sp, #160
+    add sp, sp, #176
 .endm
 
 handle_lower_sync:

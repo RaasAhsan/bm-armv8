@@ -4,7 +4,6 @@
 pub use pl011;
 pub use timer;
 pub mod exception;
-pub mod syscall;
 
 use core::arch::asm;
 

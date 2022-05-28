@@ -5,6 +5,6 @@
 
 #define SYSCALL_UART 0
 
-long syscall(uint64_t);
+uint64_t syscall(uint64_t);
 
 #endif
