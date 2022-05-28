@@ -10,6 +10,8 @@
 #include "process.h"
 #include "exception.h"
 
+#include "rstdlib.h"
+
 const uintptr_t gicd_ptr = (uintptr_t) 0x08000000;
 const uintptr_t gicc_ptr = (uintptr_t) 0x08010000; 
 
@@ -22,31 +24,13 @@ static gicc *cpu = (gicc*) gicc_ptr;
 
 void user_process(void) {
     while (1) {
-        syscall(8, 'a', 'b');
-        // int a = 2;
-        // int b = a + 3;
-        // int c = b * a; 
+        // syscall(8, 'a');
     }
 }
 
-
-void process_a(void) {
+void user_process_2(void) {
     while (1) {
-        __asm ("msr daifset, #0b0011");
-        timer_sleep(10000);
-        uart_putchar('A');
-        __asm ("msr daifclr, #0b0011");
-        // timer_sleep(1000000);
-    }
-}
-
-void process_b(void) {
-    while (1) {
-        __asm ("msr daifset, #0b0011");
-        timer_sleep(10000);
-        uart_putchar('B');
-        __asm ("msr daifclr, #0b0011");
-        // timer_sleep(1000000);
+        syscall(8, 'b');
     }
 }
 
@@ -59,6 +43,9 @@ int kmain(void) {
     gicc_init(cpu);
 
     uart_puts("Initialized Generic Interrupt Controller...\r\n");
+    char buffer[16];
+    hextostring(gicd_ptr, buffer);
+    uart_puts(buffer);
 
     gicd_clear_pending(dist, INTERRUPT_SGI);
     gicd_set_priority(dist, INTERRUPT_SGI, 0x00);
@@ -135,7 +122,8 @@ void sync_handler() {
     if (ec == EXCEPTION_SVC) {
         long syscall = process_get_trap_frame()->x8;
         if (syscall == 8) {
-            uart_putchar((char) process_get_trap_frame()->x0);
+            char c = (char) process_get_trap_frame()->x0;
+            uart_putchar(c);
         }
     }
 }

@@ -11,6 +11,7 @@ typedef enum process_status {
 } process_status;
 
 // Stores information loaded onto the kernel stack by enter_trap.
+// The trap frame is valid only for the duration of a trap.
 typedef struct trap_frame {
     uint64_t x0;
     uint64_t x1;
@@ -31,14 +32,19 @@ typedef struct trap_frame {
     uint64_t x16;
     uint64_t x17;
     uint64_t x18;
+    // TODO: other registers?
     uint64_t x30;
-    uintptr_t sp;
 } trap_frame;
+
+typedef struct process_context {
+
+} process_context;
 
 typedef struct process {
     uint8_t pid;
     process_status status;
     uintptr_t program_counter;
+    process_context context;
     trap_frame* trapframe;
 } process;
 
