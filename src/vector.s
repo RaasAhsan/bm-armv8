@@ -67,7 +67,7 @@ lower_el_serror:
     vector_entry_align
     b .
 
-.macro set_trap_frame
+.macro enter_trap
     sub sp, sp, #160 
     stp x0, x1, [sp, #0]
     stp x2, x3, [sp, #16]
@@ -84,9 +84,13 @@ lower_el_serror:
     // Set the trap frame for the current process
     mov x0, sp // aarch64 calling convention: first arg is in x0
     bl process_set_trap_frame
+
+    // Set the top of stack for the current process
+    mrs x0, sp_el0
+    bl process_set_stack
 .endm
 
-.macro restore_trap_frame
+.macro restore_trap
     ldp x0, x1, [sp, #0]
     ldp x2, x3, [sp, #16]
     ldp x4, x5, [sp, #32]
@@ -101,13 +105,13 @@ lower_el_serror:
 .endm
 
 handle_lower_sync:
-    set_trap_frame
+    enter_trap
     bl sync_handler
-    restore_trap_frame
+    restore_trap
     eret
 
 handle_interrupt:
-    set_trap_frame
+    enter_trap
     bl irq_handler
-    restore_trap_frame
+    restore_trap
     eret

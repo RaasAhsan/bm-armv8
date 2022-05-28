@@ -10,6 +10,7 @@ typedef enum process_status {
     EXITED
 } process_status;
 
+// Stores information loaded onto the kernel stack by enter_trap.
 typedef struct trap_frame {
     uint64_t x0;
     uint64_t x1;
@@ -37,10 +38,12 @@ typedef struct process {
     uint8_t pid;
     process_status status;
     uintptr_t program_counter;
+    uint8_t* stack;
     trap_frame* trapframe;
 } process;
 
 trap_frame* process_get_trap_frame(void);
 void process_set_trap_frame(uintptr_t);
+void process_set_stack(uintptr_t);
 
 #endif
