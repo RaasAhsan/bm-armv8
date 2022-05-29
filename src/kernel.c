@@ -24,14 +24,19 @@ static gicc *cpu = (gicc*) gicc_ptr;
 
 void user_process(void) {
     while (1) {
-        for (int i = 0; i < 100000; i++) {}
-        syscall(8, '1');
+        for (int i = 0; i < 1000000; i++) {}
+        syscall(8, 'A');
+        for (int i = 0; i < 1000000; i++) {}
+        syscall(8, 'B');
     }
 }
 
 void user_process_2(void) {
     while (1) {
-        syscall(8, '2');
+        for (int i = 0; i < 1000000; i++) {}
+        syscall(8, 'C');
+        for (int i = 0; i < 1000000; i++) {}
+        syscall(8, 'D');
     }
 }
 
@@ -103,7 +108,7 @@ void irq_handler() {
         uart_putchar((char)id + 0x30);
         gicc_end_interrupt(cpu, id);
     } else if (id == INTERRUPT_TIMER) {
-        uart_puts("Timer IRQ interrupt!!\n");
+        // uart_puts("Timer IRQ interrupt!!\n");
         timer_reset();
         gicc_end_interrupt(cpu, id);
 

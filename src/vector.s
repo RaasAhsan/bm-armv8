@@ -102,6 +102,7 @@ lower_el_serror:
 
 handle_lower_sync:
     enter_trap
+    mrs x25, elr_el1
     bl sync_handler
     restore_trap
     eret
@@ -116,11 +117,14 @@ handle_interrupt:
 process_restore_context:
     msr elr_el1, x0
     msr sp_el0, x1
+    ret
 
 .global process_save_context
 process_save_context:
+    mrs x23, elr_el1
+    mrs x24, elr_el1
     mrs x4, elr_el1
-    ldr x4, [x0, #0]
+    str x4, [x0]
     mrs x4, sp_el0
-    ldr x4, [x1, #0]
+    str x4, [x1]
     ret
