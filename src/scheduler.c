@@ -1,5 +1,4 @@
 #include "scheduler.h"
-#include "kernel.h"
 #include "uart.h"
 #include "exception.h"
 #include "process.h"
