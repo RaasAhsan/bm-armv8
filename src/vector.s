@@ -31,6 +31,7 @@ curr_el_spx_sync:
     // ldr x25, =0x34
     // exception syndrome register
     mrs x25, esr_el1
+    mrs x26, elr_el1
     b .
     vector_entry_align
 curr_el_spx_irq:
@@ -110,3 +111,16 @@ handle_interrupt:
     bl irq_handler
     restore_trap
     eret
+
+.global process_restore_context
+process_restore_context:
+    msr elr_el1, x0
+    msr sp_el0, x1
+
+.global process_save_context
+process_save_context:
+    mrs x4, elr_el1
+    ldr x4, [x0, #0]
+    mrs x4, sp_el0
+    ldr x4, [x1, #0]
+    ret

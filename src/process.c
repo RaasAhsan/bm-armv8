@@ -1,11 +1,13 @@
 #include "process.h"
+#include <stdlib.h>
 
-static process current_process;
+process *current_process = NULL;
+trap_frame *trapframe = NULL;
 
 trap_frame* process_get_trap_frame() {
-    return current_process.trapframe;
+    return trapframe;
 }
 
 void process_set_trap_frame(uintptr_t sp) {
-    current_process.trapframe = (trap_frame*) sp;
+    trapframe = (trap_frame*) sp;
 }

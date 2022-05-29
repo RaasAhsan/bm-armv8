@@ -24,17 +24,18 @@ static gicc *cpu = (gicc*) gicc_ptr;
 
 void user_process(void) {
     while (1) {
-        // syscall(8, 'a');
+        for (int i = 0; i < 100000; i++) {}
+        syscall(8, '1');
     }
 }
 
 void user_process_2(void) {
     while (1) {
-        syscall(8, 'b');
+        syscall(8, '2');
     }
 }
 
-int kmain(void) {
+void kernel_init(void) {
     uart_init();
 
     uart_puts("Initialized UART driver...\r\n");
@@ -70,13 +71,22 @@ int kmain(void) {
 
     uart_puts("Initialized timer...\r\n");
 
+    scheduler_init();
+
+    uart_puts("Initialized scheduler...\r\n");
+
     // timer_sleep(5000000);
 
     uart_puts("Initialization complete!\r\n");
+}
 
-    // scheduler_create_process(process_a);
-    // scheduler_create_process(process_b);
-    // scheduler_create_process(process_a);
+int kernel_main(void) {
+    scheduler_create_process(user_process);
+    scheduler_create_process(user_process_2);
+
+    uart_puts("Started process\r\n");
+
+    scheduler_switch_process();
 
     return 0;
 }
@@ -93,7 +103,7 @@ void irq_handler() {
         uart_putchar((char)id + 0x30);
         gicc_end_interrupt(cpu, id);
     } else if (id == INTERRUPT_TIMER) {
-        // uart_puts("Timer IRQ interrupt!!\n");
+        uart_puts("Timer IRQ interrupt!!\n");
         timer_reset();
         gicc_end_interrupt(cpu, id);
 

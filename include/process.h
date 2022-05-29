@@ -11,7 +11,8 @@ typedef enum process_status {
 } process_status;
 
 // Stores information loaded onto the kernel stack by enter_trap.
-// The trap frame is valid only for the duration of a trap.
+// The trap frame is used by the kernel to preserve part of the process context,
+// and is used to return from trap when switching back to a process (or context switching)
 typedef struct trap_frame {
     uint64_t x0;
     uint64_t x1;
@@ -32,23 +33,24 @@ typedef struct trap_frame {
     uint64_t x16;
     uint64_t x17;
     uint64_t x18;
-    // TODO: other registers?
     uint64_t x30;
 } trap_frame;
-
-typedef struct process_context {
-
-} process_context;
 
 typedef struct process {
     uint8_t pid;
     process_status status;
     uintptr_t program_counter;
-    process_context context;
-    trap_frame* trapframe;
+    uintptr_t stack_pointer;
+    trap_frame context;
 } process;
+
+extern process *current_process;
+extern trap_frame *trapframe;
 
 trap_frame* process_get_trap_frame(void);
 void process_set_trap_frame(uintptr_t);
+
+void process_restore_context(uintptr_t pc, uintptr_t sp);
+void process_save_context(uintptr_t* pc, uintptr_t* sp);
 
 #endif
