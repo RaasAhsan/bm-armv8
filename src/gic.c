@@ -1,5 +1,11 @@
 #include "gic.h"
 
+const uintptr_t gicd_ptr = (uintptr_t) 0x08000000;
+const uintptr_t gicc_ptr = (uintptr_t) 0x08010000; 
+
+gicd *gic_dist = (gicd*) gicd_ptr; 
+gicc *gic_cpu = (gicc*) gicc_ptr;
+
 void gicd_init(gicd *dist) {
     // Distributor is disabled on startup, but disable just in case
     dist->ctlr = GICD_CTRL_DISABLE;

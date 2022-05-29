@@ -48,6 +48,9 @@ typedef struct {
     volatile uint32_t eoir; // GICC_EOIR
 } gicc;
 
+extern gicd *gic_dist; 
+extern gicc *gic_cpu;
+
 void gicd_init(gicd *dist);
 void gicd_enable_irq(gicd *dist, irq_id id);
 void gicd_disable_irq(gicd *dist, irq_id id);
