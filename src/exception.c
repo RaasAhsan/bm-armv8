@@ -51,6 +51,8 @@ void sync_handler() {
             char c = (char) process_get_trap_frame()->x0;
             uart_putchar(c);
         }
+    } else {
+        uart_puts("Encountered an exception.");
     }
 }
 

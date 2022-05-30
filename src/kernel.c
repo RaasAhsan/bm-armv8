@@ -8,8 +8,12 @@
 #include "syscall.h"
 #include "process.h"
 #include "exception.h"
+#include "virtio.h"
 
 #include "rstdlib.h"
+
+#define VIRTIO_BASE 0x0a000000
+#define VIRTIO_MAX_DEVICES 32
 
 void user_process(void) {
     while (1) {
@@ -65,6 +69,8 @@ void kernel_init(void) {
     scheduler_init();
 
     uart_puts("Initialized scheduler...\r\n");
+
+    virtio_init(VIRTIO_BASE, 32 + 16, VIRTIO_MAX_DEVICES);
 
     // timer_sleep(5000000);
 
