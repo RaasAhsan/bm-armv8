@@ -3,9 +3,6 @@
 
 #include <stdint.h>
 
-void virtio_device_init(uintptr_t addr, uint16_t irq);
-void virtio_entropy_init(virtio_device *dev, uint16_t irq);
-
 void virtio_init(uintptr_t addr_base, uint16_t irq_base, uint16_t num_devices) {
     for (int i = 0; i < num_devices; i++) {
         virtio_device_init(addr_base + VIRTIO_DEVICE_LENGTH * i, irq_base + i);
@@ -77,13 +74,17 @@ void virtio_entropy_init(virtio_device *dev, uint16_t irq) {
     virtio_virtq_init(&q, qsz);
 
     dev->queue_num = qsz;
-    dev->guest_page_size = PAGE_SIZE;
     dev->queue_align = PAGE_SIZE;
     dev->queue_pfn = q.base >> 12;
 
     dev->status |= VIRTIO_STATUS_DRIVER_OK;
 
     uart_puts("virtio: entropy device driver ok\r\n");
+
+    uint32_t desc = virtio_desc_alloc(&q, (void*) 0x47100000, 32);
+    q.avail->ring[q.avail->idx] = desc;
+    q.avail->idx += 1;
+    dev->queue_notify = 0;
 }
 
 uint32_t align(uint32_t size, int alignment) {
@@ -91,7 +92,7 @@ uint32_t align(uint32_t size, int alignment) {
 }
 
 void virtio_virtq_init(virtio_virtq *q, uint16_t queue_size) {
-    uintptr_t desc_base = 0x50000000; // already aligned on a new 4096K page
+    uintptr_t desc_base = 0x47000000; // already aligned on a new 4096K page
     uint32_t desc_size = sizeof(virtio_virtq_desc) * queue_size;
     virtio_virtq_desc *desc = (virtio_virtq_desc*) desc_base;
 
@@ -107,4 +108,13 @@ void virtio_virtq_init(virtio_virtq *q, uint16_t queue_size) {
     q->desc = desc;
     q->avail = avail;
     q->used = used;
+}
+
+uint16_t virtio_desc_alloc(virtio_virtq *q, void *addr, uint32_t len) {
+    uint16_t idx = 0;
+    q->desc[idx].addr = (uint32_t) addr;
+    q->desc[idx].len = len;
+    q->desc[idx].flags |= VIRTQ_DESC_WRITE;
+
+    return idx;
 }

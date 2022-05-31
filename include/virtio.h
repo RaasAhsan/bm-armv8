@@ -43,6 +43,7 @@ typedef volatile struct __attribute__((__packed__)) {
     const uint32_t _reserved3[3];
     const uint32_t interrupt_status;
     uint32_t interrupt_ack;
+    const uint32_t _reserved4[2];
     uint32_t status;
     uint32_t config[0];
 } virtio_device;
@@ -84,6 +85,10 @@ typedef struct __attribute__((__packed__)) {
 } virtio_virtq;
 
 void virtio_init(uintptr_t addr_base, uint16_t irq_base, uint16_t num_devices);
+void virtio_device_init(uintptr_t addr, uint16_t irq);
+void virtio_entropy_init(virtio_device *dev, uint16_t irq);
+
 void virtio_virtq_init(virtio_virtq *q, uint16_t queue_size);
+uint16_t virtio_desc_alloc(virtio_virtq *q, void *addr, uint32_t len);
 
 #endif
