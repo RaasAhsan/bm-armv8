@@ -1,5 +1,7 @@
 #include "virtio.h"
 #include "uart.h"
+#include "gic.h"
+#include "exception.h"
 
 #include <stdint.h>
 
@@ -45,6 +47,13 @@ void virtio_dev_init(uintptr_t addr, uint16_t irq) {
 
 #define PAGE_SIZE 4096
 
+static void virtio_rng_isr(void *data) {
+    virtio_dev *dev = (virtio_dev*) data;
+    uart_puts("virtio-rng interrupt\r\n");
+
+    dev->interrupt_ack = dev->interrupt_status;
+}
+
 void virtio_rng_init(virtio_dev *dev, uint16_t irq) {
     uart_puts("virtio: discovered entropy device\r\n");
 
@@ -78,6 +87,15 @@ void virtio_rng_init(virtio_dev *dev, uint16_t irq) {
     dev->queue_num = qsz;
     dev->queue_align = PAGE_SIZE;
     dev->queue_pfn = q.base >> 12;
+
+    isr_handler rng_isr;
+    rng_isr.handler = virtio_rng_isr;
+    rng_isr.data = (void*) dev;
+    register_isr(irq, rng_isr);
+    gicd_clear_pending(gic_dist, irq);
+    gicd_set_priority(gic_dist, irq, 0x00);
+    gicd_set_config(gic_dist, irq, GICD_LEVEL_SENSITIVE);
+    gicd_enable_irq(gic_dist, irq);
 
     dev->status |= VIRTIO_STATUS_DRIVER_OK;
 

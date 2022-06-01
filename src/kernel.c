@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <stdlib.h>
 
 #include "uart.h"
 #include "gic.h"
@@ -33,18 +34,18 @@ void user_process_2(void) {
     }
 }
 
-void sgi_handler(void) {
+void sgi_handler(void *data) {
     uart_puts("SGI IRQ interrupt!!\n");
 }
 
-void timer_handler(void) {
+void timer_handler(void *data) {
     // uart_puts("Timer IRQ interrupt!!\n");
     timer_reset();
 
     scheduler_switch_process();
 }
 
-void uart_handler(void) {
+void uart_handler(void *data) {
     uart_puts("UART interrupt!!\n");
     // TODO: handle statuses here
     char c = uart_getchar();
@@ -63,29 +64,35 @@ void kernel_init(void) {
 
     uart_puts("Initialized Generic Interrupt Controller...\r\n");
 
+    isr_handler sgi_isr;
+    sgi_isr.handler = sgi_handler;
+    register_isr(INTERRUPT_SGI, sgi_isr);
     gicd_clear_pending(gic_dist, INTERRUPT_SGI);
     gicd_set_priority(gic_dist, INTERRUPT_SGI, 0x00);
     gicd_set_config(gic_dist, INTERRUPT_SGI, GICD_EDGE_TRIGGERED);
     gicd_enable_irq(gic_dist, INTERRUPT_SGI);
-    register_isr(INTERRUPT_SGI, sgi_handler);
 
     uart_puts("Registered SGI interrupt...\r\n");
 
     // gicd_sgi(dist, SGI_INTERRUPT);
 
+    isr_handler uart_isr;
+    uart_isr.handler = uart_handler;
+    register_isr(INTERRUPT_UART, uart_isr);
     gicd_clear_pending(gic_dist, INTERRUPT_UART);
     gicd_set_priority(gic_dist, INTERRUPT_UART, 0x00);
     gicd_set_config(gic_dist, INTERRUPT_UART, GICD_EDGE_TRIGGERED);
     gicd_enable_irq(gic_dist, INTERRUPT_UART);
-    register_isr(INTERRUPT_UART, uart_handler);
 
     uart_puts("Registered UART interrupt...\r\n");
 
+    isr_handler timer_isr;
+    timer_isr.handler = timer_handler;
+    register_isr(INTERRUPT_TIMER, timer_isr);
     gicd_clear_pending(gic_dist, INTERRUPT_TIMER);
     gicd_set_priority(gic_dist, INTERRUPT_TIMER, 0x00);
     gicd_set_config(gic_dist, INTERRUPT_TIMER, GICD_LEVEL_SENSITIVE);
     gicd_enable_irq(gic_dist, INTERRUPT_TIMER);
-    register_isr(INTERRUPT_TIMER, timer_handler);
 
     uart_puts("Initialized timer...\r\n");
 

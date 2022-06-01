@@ -9,7 +9,12 @@
 #define INTERRUPT_TIMER 27
 #define INTERRUPT_UART 33
 
-void register_isr(uint16_t, void (*)(void));
+typedef struct {
+    void (*handler)(void*);
+    void *data;
+} isr_handler;
+
+void register_isr(uint16_t, isr_handler);
 
 void set_exception_link(uint64_t);
 

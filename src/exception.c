@@ -10,9 +10,10 @@
 
 #define MAX_INTERRUPTS 1023
 
-static void (*isr[MAX_INTERRUPTS])(void);
+// TODO: move this to GIC? technically IRQ handling is part of GIC
+static isr_handler isr[MAX_INTERRUPTS];
 
-void register_isr(uint16_t irq_id, void (*handler)(void)) {
+void register_isr(uint16_t irq_id, isr_handler handler) {
     isr[irq_id] = handler;
 }
 
@@ -23,14 +24,14 @@ void irq_handler() {
         return;
     }
 
-    void (*handler)(void) = isr[id];
-    if (handler == NULL) {
+    isr_handler handler = isr[id];
+    if (handler.handler == NULL) {
         uart_puts("Unhandled IRQ!\n");
         gicc_end_interrupt(gic_cpu, id);
         return;
     }
 
-    handler();
+    handler.handler(handler.data);
 
     // if (id == 32 + 16 + 30) {
     //     uart_puts("virtio interrupt!\n");
