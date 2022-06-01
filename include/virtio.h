@@ -46,7 +46,7 @@ typedef volatile struct __attribute__((__packed__)) {
     const uint32_t _reserved4[2];
     uint32_t status;
     uint32_t config[0];
-} virtio_device;
+} virtio_dev;
 
 #define VIRTQ_DESC_NEXT 1
 #define VIRTQ_DESC_WRITE 2
@@ -58,37 +58,46 @@ typedef volatile struct __attribute__((__packed__)) {
     uint32_t len;
     uint16_t flags;
     uint16_t next;
-} virtio_virtq_desc;
+} virtq_desc;
 
 typedef volatile struct __attribute__((__packed__)) {
     uint16_t flags;
     uint16_t idx;
     uint16_t ring[0];
-} virtio_virtq_avail;
+} virtq_avail;
 
 typedef volatile struct __attribute__((__packed__)) {
     uint32_t id;
     uint32_t len;
-} virtio_virtq_used_elem;
+} virtq_used_elem;
 
 typedef volatile struct __attribute__((__packed__)) {
     uint16_t flags;
     uint16_t idx;
-    virtio_virtq_used_elem ring[0];
-} virtio_virtq_used;
+    virtq_used_elem ring[0];
+} virtq_used;
 
 typedef struct __attribute__((__packed__)) {
     uintptr_t base;
-    virtio_virtq_desc *desc;
-    virtio_virtq_avail *avail;
-    virtio_virtq_used *used;
-} virtio_virtq;
+    uint16_t free_desc;
+    virtq_desc *desc;
+    virtq_avail *avail;
+    virtq_used *used;
+} virtq;
+
+
+typedef struct __attribute__((__packed__)) {
+    virtio_dev *dev;
+    virtq *requestq;
+} virtio_rng;
 
 void virtio_init(uintptr_t addr_base, uint16_t irq_base, uint16_t num_devices);
-void virtio_device_init(uintptr_t addr, uint16_t irq);
-void virtio_entropy_init(virtio_device *dev, uint16_t irq);
+void virtio_dev_init(uintptr_t addr, uint16_t irq);
 
-void virtio_virtq_init(virtio_virtq *q, uint16_t queue_size);
-uint16_t virtio_desc_alloc(virtio_virtq *q, void *addr, uint32_t len);
+void virtq_init(virtq *q, uint16_t queue_size);
+uint16_t virtq_desc_alloc(virtq *q);
+void virtq_desc_free(virtq *q, uint16_t desc);
+
+void virtio_rng_init(virtio_dev *dev, uint16_t irq);
 
 #endif

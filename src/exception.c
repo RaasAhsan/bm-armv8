@@ -32,6 +32,9 @@ void irq_handler() {
         // TODO: this doesn't seem to be necessary
         uart_clear_interrupts();
         gicc_end_interrupt(gic_cpu, id);
+    } else if (id == 32 + 16 + 30) {
+        uart_puts("virtio interrupt!\n");
+        gicc_end_interrupt(gic_cpu, id);
     } else {
         uart_puts("Unhandled IRQ!!\n");
         gicc_end_interrupt(gic_cpu, id);

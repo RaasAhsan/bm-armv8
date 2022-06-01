@@ -66,6 +66,13 @@ void kernel_init(void) {
 
     uart_puts("Initialized timer...\r\n");
 
+    // gicd_clear_pending(gic_dist, 32 + 16 + 30);
+    // gicd_set_priority(gic_dist, 32 + 16 + 30, 0x00);
+    // gicd_set_config(gic_dist, 32 + 16 + 30, GICD_LEVEL_SENSITIVE);
+    // gicd_enable_irq(gic_dist, 32 + 16 + 30);
+
+    // uart_puts("Initialized virtio-rng device...\r\n");
+
     scheduler_init();
 
     uart_puts("Initialized scheduler...\r\n");
