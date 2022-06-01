@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <stdlib.h>
 
 #include "exception.h"
 #include "gic.h"
@@ -7,6 +8,14 @@
 #include "scheduler.h"
 #include "timer.h"
 
+#define MAX_INTERRUPTS 1023
+
+static void (*isr[MAX_INTERRUPTS])(void);
+
+void register_isr(uint16_t irq_id, void (*handler)(void)) {
+    isr[irq_id] = handler;
+}
+
 // ISR (interrupt service routine) for peripherals
 void irq_handler() {
     uint16_t id = gicc_acknowledge_interrupt(gic_cpu);
@@ -14,31 +23,20 @@ void irq_handler() {
         return;
     }
 
-    if (id == INTERRUPT_SGI) {
-        uart_puts("SGI IRQ interrupt!!\n");
-        uart_putchar((char)id + 0x30);
+    void (*handler)(void) = isr[id];
+    if (handler == NULL) {
+        uart_puts("Unhandled IRQ!\n");
         gicc_end_interrupt(gic_cpu, id);
-    } else if (id == INTERRUPT_TIMER) {
-        // uart_puts("Timer IRQ interrupt!!\n");
-        timer_reset();
-        gicc_end_interrupt(gic_cpu, id);
-
-        scheduler_switch_process();
-    } else if (id == INTERRUPT_UART) {
-        uart_puts("UART interrupt!!\n");
-        // TODO: handle statuses here
-        char c = uart_getchar();
-        uart_putchar(c);
-        // TODO: this doesn't seem to be necessary
-        uart_clear_interrupts();
-        gicc_end_interrupt(gic_cpu, id);
-    } else if (id == 32 + 16 + 30) {
-        uart_puts("virtio interrupt!\n");
-        gicc_end_interrupt(gic_cpu, id);
-    } else {
-        uart_puts("Unhandled IRQ!!\n");
-        gicc_end_interrupt(gic_cpu, id);
+        return;
     }
+
+    handler();
+
+    // if (id == 32 + 16 + 30) {
+    //     uart_puts("virtio interrupt!\n");
+    // }
+
+    gicc_end_interrupt(gic_cpu, id);
 
     // char buf[16];
     // uart_gets(u, buf);

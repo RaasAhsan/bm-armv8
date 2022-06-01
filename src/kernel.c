@@ -33,6 +33,26 @@ void user_process_2(void) {
     }
 }
 
+void sgi_handler(void) {
+    uart_puts("SGI IRQ interrupt!!\n");
+}
+
+void timer_handler(void) {
+    // uart_puts("Timer IRQ interrupt!!\n");
+    timer_reset();
+
+    scheduler_switch_process();
+}
+
+void uart_handler(void) {
+    uart_puts("UART interrupt!!\n");
+    // TODO: handle statuses here
+    char c = uart_getchar();
+    uart_putchar(c);
+    // TODO: this doesn't seem to be necessary
+    uart_clear_interrupts();
+}
+
 void kernel_init(void) {
     uart_init();
 
@@ -47,6 +67,7 @@ void kernel_init(void) {
     gicd_set_priority(gic_dist, INTERRUPT_SGI, 0x00);
     gicd_set_config(gic_dist, INTERRUPT_SGI, GICD_EDGE_TRIGGERED);
     gicd_enable_irq(gic_dist, INTERRUPT_SGI);
+    register_isr(INTERRUPT_SGI, sgi_handler);
 
     uart_puts("Registered SGI interrupt...\r\n");
 
@@ -56,6 +77,7 @@ void kernel_init(void) {
     gicd_set_priority(gic_dist, INTERRUPT_UART, 0x00);
     gicd_set_config(gic_dist, INTERRUPT_UART, GICD_EDGE_TRIGGERED);
     gicd_enable_irq(gic_dist, INTERRUPT_UART);
+    register_isr(INTERRUPT_UART, uart_handler);
 
     uart_puts("Registered UART interrupt...\r\n");
 
@@ -63,6 +85,7 @@ void kernel_init(void) {
     gicd_set_priority(gic_dist, INTERRUPT_TIMER, 0x00);
     gicd_set_config(gic_dist, INTERRUPT_TIMER, GICD_LEVEL_SENSITIVE);
     gicd_enable_irq(gic_dist, INTERRUPT_TIMER);
+    register_isr(INTERRUPT_TIMER, timer_handler);
 
     uart_puts("Initialized timer...\r\n");
 

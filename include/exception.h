@@ -9,6 +9,8 @@
 #define INTERRUPT_TIMER 27
 #define INTERRUPT_UART 33
 
+void register_isr(uint16_t, void (*)(void));
+
 void set_exception_link(uint64_t);
 
 void return_from_exception(void);
