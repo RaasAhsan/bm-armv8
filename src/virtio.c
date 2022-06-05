@@ -102,7 +102,7 @@ void virtio_rng_init(virtio_dev *dev, uint16_t irq) {
     uart_puts("virtio: entropy device driver ok\r\n");
 
     uint32_t desc = virtq_desc_alloc(&q);
-    q.desc[desc].addr = (uint32_t) (void*) 0x47100000;
+    q.desc[desc].addr = (uint32_t) (void*) 0x40900000;
     q.desc[desc].len = 32;
     q.desc[desc].flags |= VIRTQ_DESC_WRITE;
 
