@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-void kmalloc_init(uintptr_t);
+void kmalloc_init(uintptr_t, size_t);
 void *kmalloc(size_t);
 
 #endif

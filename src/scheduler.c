@@ -6,9 +6,12 @@
 #include "process.h"
 #include "kmalloc.h"
 
+// TODO: this probably belongs elsewhere
 #define MAX_PROCESSES 128
 #define PROC_MEM_BASE 0x40200000
 #define PROC_MEM_SIZE 0x2000
+
+// implements roundrobin scheduling
 
 struct runqueue {
     struct process_list *head;
