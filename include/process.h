@@ -49,7 +49,6 @@ struct process_list {
     struct process_list *next;
 };
 
-extern process *current_process;
 extern trap_frame *trapframe;
 
 // Used during interrupts

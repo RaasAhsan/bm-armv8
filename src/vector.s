@@ -47,6 +47,7 @@ curr_el_spx_serror:
     // Lower EL using AArch64
     vector_entry_align
 lower_el_sync:
+    mrs x23, elr_el1
     b handle_lower_sync
     vector_entry_align
 lower_el_irq:

@@ -1,7 +1,6 @@
 #include "process.h"
 #include <stdlib.h>
 
-process *current_process = NULL;
 trap_frame *trapframe = NULL;
 
 trap_frame* process_get_trap_frame() {

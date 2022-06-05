@@ -59,7 +59,7 @@ void kernel_init(void) {
     uart_init();
     uart_puts("Initialized UART driver...\r\n");
 
-    kmalloc_init(0x40800000);
+    kmalloc_init(0x40810000);
     uart_puts("Initialized kernel memory allocator...\r\n");
 
     gicd_init(gic_dist);
