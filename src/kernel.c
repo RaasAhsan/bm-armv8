@@ -10,6 +10,7 @@
 #include "process.h"
 #include "exception.h"
 #include "virtio.h"
+#include "kmalloc.h"
 
 #include "rstdlib.h"
 
@@ -19,18 +20,18 @@
 void user_process(void) {
     while (1) {
         for (int i = 0; i < 10000000; i++) {}
-        syscall(8, 'A');
+        syscall(SYSCALL_UART_OUT, 'A');
         for (int i = 0; i < 10000000; i++) {}
-        syscall(8, 'B');
+        syscall(SYSCALL_UART_OUT, 'B');
     }
 }
 
 void user_process_2(void) {
     while (1) {
         for (int i = 0; i < 10000000; i++) {}
-        syscall(8, 'C');
+        syscall(SYSCALL_UART_OUT, 'C');
         for (int i = 0; i < 10000000; i++) {}
-        syscall(8, 'D');
+        syscall(SYSCALL_UART_OUT, 'D');
     }
 }
 
@@ -56,12 +57,13 @@ void uart_handler(void *data) {
 
 void kernel_init(void) {
     uart_init();
-
     uart_puts("Initialized UART driver...\r\n");
+
+    kmalloc_init(0x40800000);
+    uart_puts("Initialized kernel memory allocator...\r\n");
 
     gicd_init(gic_dist);
     gicc_init(gic_cpu);
-
     uart_puts("Initialized Generic Interrupt Controller...\r\n");
 
     isr_handler sgi_isr;

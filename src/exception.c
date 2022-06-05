@@ -7,6 +7,7 @@
 #include "uart.h"
 #include "scheduler.h"
 #include "timer.h"
+#include "syscall.h"
 
 #define MAX_INTERRUPTS 1023
 
@@ -47,14 +48,28 @@ void irq_handler() {
 void sync_handler() {
     uint8_t ec = get_exception_class();
 
-    if (ec == EXCEPTION_SVC) {
-        long syscall = process_get_trap_frame()->x8;
-        if (syscall == 8) {
-            char c = (char) process_get_trap_frame()->x0;
-            uart_putchar(c);
+    switch(ec) {
+        case EXCEPTION_SVC: {
+            long syscall = process_get_trap_frame()->x8;
+            switch (syscall) {
+                case SYSCALL_UART_OUT: {
+                    char c = (char) process_get_trap_frame()->x0;
+                    uart_putchar(c);
+                    break;
+                }
+                case SYSCALL_EXIT: {
+                    // Unschedule process
+                    break;
+                }
+                default: {
+                    uart_puts("Unhandled syscall\r\n");
+                }
+            }
+            return;
         }
-    } else {
-        uart_puts("Encountered an exception.");
+        default: {
+            uart_puts("Encountered an exception.\r\n");
+        }
     }
 }
 

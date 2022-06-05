@@ -1,50 +1,53 @@
+#include <stdlib.h>
+
 #include "scheduler.h"
 #include "uart.h"
 #include "exception.h"
 #include "process.h"
 
 #define MAX_PROCESSES 128
-#define STACK_BASE 0x40200000
-#define STACK_SIZE 0x2000
+#define PROC_MEM_BASE 0x40200000
+#define PROC_MEM_SIZE 0x2000
 
 // Process list
-static process processes[MAX_PROCESSES];
+static process processes[MAX_PROCESSES]; // just using this as a hack in place of kmalloc
+static struct process_list *process_list = NULL;
 
-static int next_process_id = 0;
-
-static uintptr_t current_stack = STACK_BASE;
+static int next_pid = 0;
+static uintptr_t current_stack = PROC_MEM_BASE;
 
 void scheduler_init() {
     
 }
 
+// TODO: should scheduler be concerned with process creation, or just execution?
 void scheduler_create_process(void (*start)(void)) {
-    if (next_process_id >= MAX_PROCESSES) {
+    if (next_pid >= MAX_PROCESSES) {
         return;
     }
 
-    current_stack += STACK_SIZE;
+    current_stack += PROC_MEM_SIZE;
 
-    process *p = &processes[next_process_id];
-    p->pid = (uint8_t) next_process_id;
+    process *p = &processes[next_pid];
+    p->pid = (uint8_t) next_pid;
     p->status = CREATED;
     p->program_counter = (uintptr_t) start;
     p->stack_pointer = (uintptr_t) current_stack;
 
     current_process = p;
 
-    next_process_id++;
+    next_pid++;
 }
     #include "rstdlib.h"
 
 // TODO: more sophisticated scheduling
 void scheduler_switch_process() {
-    if (next_process_id == 0) {
+    if (next_pid == 0) {
         return;
     }
 
     uint8_t current_pid = current_process->pid;
-    uint8_t next_pid = (current_pid + 1) % next_process_id;
+    uint8_t next_pid = (current_pid + 1) % next_pid;
 
     if (next_pid == current_pid) {
         return;

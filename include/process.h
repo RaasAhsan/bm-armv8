@@ -44,12 +44,19 @@ typedef struct process {
     trap_frame context;
 } process;
 
+struct process_list {
+    process *p;
+    struct process_list *next;
+};
+
 extern process *current_process;
 extern trap_frame *trapframe;
 
+// Used during interrupts
 trap_frame* process_get_trap_frame(void);
 void process_set_trap_frame(uintptr_t);
 
+// Used during context switches
 void process_restore_context(uintptr_t pc, uintptr_t sp);
 void process_save_context(uintptr_t* pc, uintptr_t* sp);
 
