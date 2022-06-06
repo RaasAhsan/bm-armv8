@@ -1,6 +1,7 @@
 #include "process.h"
 #include "kmalloc.h"
-#include <stdlib.h>
+
+#include <stddef.h>
 
 trap_frame *trapframe = NULL;
 

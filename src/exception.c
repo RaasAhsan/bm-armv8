@@ -1,5 +1,4 @@
-#include <stdint.h>
-#include <stdlib.h>
+#include <stddef.h>
 
 #include "exception.h"
 #include "gic.h"
