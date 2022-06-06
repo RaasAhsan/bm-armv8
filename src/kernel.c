@@ -123,6 +123,9 @@ int kernel_main(void) {
     uart_puts("Started process\r\n");
 
     scheduler_switch_process();
+    // while (1) {
+        
+    // }
 
     return 0;
 }
