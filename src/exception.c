@@ -59,6 +59,7 @@ void sync_handler() {
                 }
                 case SYSCALL_EXIT: {
                     // Unschedule process
+                    scheduler_exit_process();
                     break;
                 }
                 default: {

@@ -1,5 +1,5 @@
 #include <stdint.h>
-#include <stdlib.h>
+#include <stddef.h>
 
 #include "uart.h"
 #include "gic.h"
@@ -27,12 +27,20 @@ void user_process(void) {
 }
 
 void user_process_2(void) {
+    int i = 0;
     while (1) {
         for (int i = 0; i < 10000000; i++) {}
         syscall(SYSCALL_UART_OUT, 'C');
         for (int i = 0; i < 10000000; i++) {}
         syscall(SYSCALL_UART_OUT, 'D');
+
+        i++;
+        if (i == 20) {
+            break;
+        }
     }
+
+    exit();
 }
 
 void sgi_handler(void *data) {
@@ -43,7 +51,7 @@ void timer_handler(void *data) {
     // uart_puts("Timer IRQ interrupt!!\n");
     timer_reset();
 
-    scheduler_switch_process();
+    scheduler_context_switch();
 }
 
 void uart_handler(void *data) {
@@ -122,7 +130,7 @@ int kernel_main(void) {
 
     uart_puts("Started process\r\n");
 
-    scheduler_switch_process();
+    scheduler_context_switch();
     // while (1) {
         
     // }
