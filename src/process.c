@@ -3,7 +3,32 @@
 
 #include <stddef.h>
 
+#define NUM_MAX_PROC 128
+#define PROC_MEM_BASE 0x40200000
+#define PROC_MEM_SIZE 0x2000
+
 trap_frame *trapframe = NULL;
+
+static int pid_count = 0;
+static uintptr_t current_stack = PROC_MEM_BASE;
+
+process *process_create(void (*start)(void)) {
+    if (pid_count >= NUM_MAX_PROC) {
+        return NULL;
+    }
+
+    current_stack += PROC_MEM_SIZE;
+
+    process *p = (process*) kmalloc(sizeof(process));
+    p->pid = (uint8_t) pid_count;
+    p->status = CREATED;
+    p->program_counter = (uintptr_t) start;
+    p->stack_pointer = (uintptr_t) current_stack;
+
+    pid_count++;
+
+    return p;
+}
 
 trap_frame* process_get_trap_frame() {
     return trapframe;

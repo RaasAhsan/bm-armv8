@@ -125,8 +125,11 @@ void kernel_init(void) {
 }
 
 int kernel_main(void) {
-    scheduler_create_process(user_process);
-    scheduler_create_process(user_process_2);
+    process *p1 = process_create(user_process);
+    process *p2 = process_create(user_process_2);
+
+    scheduler_schedule_process(p1);
+    scheduler_schedule_process(p2);
 
     uart_puts("Started process\r\n");
 

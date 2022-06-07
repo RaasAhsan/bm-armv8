@@ -6,38 +6,16 @@
 #include "process.h"
 #include "kmalloc.h"
 
-// TODO: this probably belongs elsewhere
-#define NUM_MAX_PROC 128
-#define PROC_MEM_BASE 0x40200000
-#define PROC_MEM_SIZE 0x2000
-
 // implements roundrobin scheduling
 static struct process_list runqueue;
 static struct process *current = NULL;
-
-static int pid_count = 0;
-static uintptr_t current_stack = PROC_MEM_BASE;
 
 void scheduler_init() {
     process_list_init(&runqueue);
 }
 
-void scheduler_create_process(void (*start)(void)) {
-    if (pid_count >= NUM_MAX_PROC) {
-        return;
-    }
-
-    current_stack += PROC_MEM_SIZE;
-
-    process *p = (process*) kmalloc(sizeof(process));
-    p->pid = (uint8_t) pid_count;
-    p->status = CREATED;
-    p->program_counter = (uintptr_t) start;
-    p->stack_pointer = (uintptr_t) current_stack;
-
+void scheduler_schedule_process(process *p) {
     process_list_push(&runqueue, p);
-
-    pid_count++;
 }
 
 static void scheduler_pause_process(process *p) {
@@ -78,7 +56,7 @@ static void scheduler_resume_process(process *p) {
 
 // TODO: more sophisticated scheduling
 void scheduler_context_switch() {
-    if (pid_count == 0) {
+    if (current == NULL && runqueue.head == NULL) {
         return;
     }
 
@@ -102,6 +80,7 @@ void scheduler_context_switch() {
 void scheduler_exit_process(void) {
     // TODO: free memory from process
     // TODO: notify parent/etc of child process termination if waiting
+    // TODO: does this live elsewhere?
     current = NULL;
 
     struct process *next = process_list_pop(&runqueue);

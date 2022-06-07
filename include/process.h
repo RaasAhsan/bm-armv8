@@ -46,6 +46,8 @@ typedef struct process {
 
 extern trap_frame *trapframe;
 
+process *process_create(void (*)(void));
+
 // Used during interrupts
 trap_frame* process_get_trap_frame(void);
 void process_set_trap_frame(uintptr_t);
