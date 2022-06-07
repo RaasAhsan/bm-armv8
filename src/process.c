@@ -30,6 +30,39 @@ process *process_create(void (*start)(void)) {
     return p;
 }
 
+void process_suspend(process* p) {
+    process_save_context(&p->program_counter, &p->stack_pointer);
+    p->context.x0 = trapframe->x0;
+    p->context.x1 = trapframe->x1;
+    p->context.x2 = trapframe->x2;
+    p->context.x3 = trapframe->x3;
+    p->context.x4 = trapframe->x4;
+    p->context.x5 = trapframe->x5;
+    p->context.x6 = trapframe->x6;
+    p->context.x7 = trapframe->x7;
+    p->context.x8 = trapframe->x8;
+    p->context.x30 = trapframe->x30;
+
+}
+
+void process_resume(process* p) {
+    // Set trapframe to stored process trapframe if it had been running
+    if (p->status == RUNNING) {
+        trapframe->x0 = p->context.x0;
+        trapframe->x1 = p->context.x1;
+        trapframe->x2 = p->context.x2;
+        trapframe->x3 = p->context.x3;
+        trapframe->x4 = p->context.x4;
+        trapframe->x5 = p->context.x5;
+        trapframe->x6 = p->context.x6;
+        trapframe->x7 = p->context.x7;
+        trapframe->x8 = p->context.x8;
+        trapframe->x30 = p->context.x30;
+    }
+    p->status = RUNNING;
+    process_restore_context(p->program_counter, p->stack_pointer);
+}
+
 trap_frame* process_get_trap_frame() {
     return trapframe;
 }

@@ -44,9 +44,9 @@ typedef struct process {
     trap_frame context;
 } process;
 
-extern trap_frame *trapframe;
-
 process *process_create(void (*)(void));
+void process_suspend(process*);
+void process_resume(process*);
 
 // Used during interrupts
 trap_frame* process_get_trap_frame(void);
@@ -69,5 +69,7 @@ struct process_list {
 void process_list_init(struct process_list*);
 void process_list_push(struct process_list*, process*);
 process* process_list_pop(struct process_list*);
+
+extern trap_frame *trapframe;
 
 #endif
