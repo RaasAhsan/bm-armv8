@@ -14,7 +14,7 @@ void scheduler_init() {
     process_list_init(&runqueue);
 }
 
-void scheduler_schedule_process(process *p) {
+void scheduler_schedule_process(struct process *p) {
     process_list_push(&runqueue, p);
 }
 
@@ -24,7 +24,7 @@ static void scheduler_pause_process() {
     current = NULL;
 }
 
-static void scheduler_resume_process(process *p) {
+static void scheduler_resume_process(struct process *p) {
     process_resume(p);
     current = p;
 }

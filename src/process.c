@@ -7,19 +7,19 @@
 #define PROC_MEM_BASE 0x40200000
 #define PROC_MEM_SIZE 0x2000
 
-trap_frame *trapframe = NULL;
+struct trap_frame *trapframe = NULL;
 
 static int pid_count = 0;
 static uintptr_t current_stack = PROC_MEM_BASE;
 
-process *process_create(void (*start)(void)) {
+struct process *process_create(void (*start)(void)) {
     if (pid_count >= NUM_MAX_PROC) {
         return NULL;
     }
 
     current_stack += PROC_MEM_SIZE;
 
-    process *p = (process*) kmalloc(sizeof(process));
+    struct process *p = (struct process*) kmalloc(sizeof(struct process));
     p->pid = (uint8_t) pid_count;
     p->status = CREATED;
     p->program_counter = (uintptr_t) start;
@@ -30,7 +30,7 @@ process *process_create(void (*start)(void)) {
     return p;
 }
 
-void process_suspend(process* p) {
+void process_suspend(struct process *p) {
     process_save_context(&p->program_counter, &p->stack_pointer);
     p->context.x0 = trapframe->x0;
     p->context.x1 = trapframe->x1;
@@ -45,7 +45,7 @@ void process_suspend(process* p) {
 
 }
 
-void process_resume(process* p) {
+void process_resume(struct process *p) {
     // Set trapframe to stored process trapframe if it had been running
     if (p->status == RUNNING) {
         trapframe->x0 = p->context.x0;
@@ -63,12 +63,12 @@ void process_resume(process* p) {
     process_restore_context(p->program_counter, p->stack_pointer);
 }
 
-trap_frame* process_get_trap_frame() {
+struct trap_frame* process_get_trap_frame() {
     return trapframe;
 }
 
 void process_set_trap_frame(uintptr_t sp) {
-    trapframe = (trap_frame*) sp;
+    trapframe = (struct trap_frame*) sp;
 }
 
 void process_list_init(struct process_list *plist) {
@@ -76,7 +76,7 @@ void process_list_init(struct process_list *plist) {
     plist->tail = NULL;
 }
 
-void process_list_push(struct process_list *plist, process *p) {
+void process_list_push(struct process_list *plist, struct process *p) {
     struct process_head *node = (struct process_head*) kmalloc(sizeof(struct process_head));
     node->p = p;
     node->next = NULL;
@@ -89,7 +89,7 @@ void process_list_push(struct process_list *plist, process *p) {
     }
 }
 
-process* process_list_pop(struct process_list *plist) {
+struct process *process_list_pop(struct process_list *plist) {
     struct process_head *head = plist->head;
     if (head == NULL) {
         return NULL;

@@ -2,6 +2,7 @@
 #include "uart.h"
 #include "gic.h"
 #include "exception.h"
+#include "process.h"
 
 #include <stdint.h>
 

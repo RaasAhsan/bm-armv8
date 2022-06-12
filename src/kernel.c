@@ -125,8 +125,8 @@ void kernel_init(void) {
 }
 
 int kernel_main(void) {
-    process *p1 = process_create(user_process);
-    process *p2 = process_create(user_process_2);
+    struct process *p1 = process_create(user_process);
+    struct process *p2 = process_create(user_process_2);
 
     scheduler_schedule_process(p1);
     scheduler_schedule_process(p2);
